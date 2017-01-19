@@ -16,9 +16,6 @@ function animateChart() {
       .attr('stroke', '#FA2F97')
       .attr('stroke-width', 2)
 
-
-
-
   var totalLength = secondPath.node().getTotalLength();
 
   d3.select('path#path-group-insert-one')
@@ -26,13 +23,13 @@ function animateChart() {
       .attr('stroke-dashoffset', totalLength)
       .transition()
       .duration(1000)
-      .ease("linear")
+      .ease('linear')
       .attr('stroke-dashoffset', 0)
 
 
 
   setTimeout(function() {
-      svg.select('#Chart-dot-current-Copy-78')
+      svg.select('#chart-dot-nine')
       .transition()
       .duration(200)
       .ease('linear')
