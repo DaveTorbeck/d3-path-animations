@@ -36,16 +36,16 @@ function animateChart() {
   var dashArray = newDashes + " 0, " + totalLength;
 
   d3.select('path#path-group-insert-two')
-    .attr("stroke-dashoffset", totalLength)
+    .attr('stroke-dashoffset', totalLength)
     .attr('stroke-dasharray', dashArray)
     .transition()
       .duration(1000)
       .ease('linear')
-      .attr("stroke-dashoffset", 0);
+      .attr('stroke-dashoffset', 0);
 
   d3.select('path#path-group-insert-white')
     .attr('stroke-dasharray', totalLength + ' ' + totalLength)
-    .attr("stroke-dashoffset", totalLength)
+    .attr('stroke-dashoffset', totalLength)
     .transition()
       .duration(1200)
       .ease('linear')
@@ -60,10 +60,6 @@ function animateChart() {
   //       .ease('linear')
   //       .attr("stroke-dashoffset", totalLength);
   // }
-
-  // setTimeout(function() {
-  //   deleteDottedLine();
-  // }, 1050)
 
   var pathTwo = svg.select('path#path-group-two');
   var d = pathTwo[0][0].attributes.d.value;
@@ -85,8 +81,6 @@ function animateChart() {
         .ease('linear')
         .attr('stroke-dashoffset', 0)
 
-
-
   setTimeout(function() {
       svg.select('#chart-dot-nine')
       .transition()
@@ -94,5 +88,38 @@ function animateChart() {
       .ease('linear')
       .attr('fill', '#FA2F97')
       .attr('stroke', '#FA2F97')
+      .attr('stroke-width', 0)
+
+      svg.select('#chart-dot-nine ellipse')
+        .transition()
+        .duration(300)
+        .ease('linear')
+        .attr('rx', 11.05)
+        .attr('ry', 11.05)
+        .transition()
+        .duration(300)
+        .ease('linear')
+
+      setTimeout(function(){
+        svg.select('#chart-dot-nine')
+          .append('use')
+          .attr('stroke-width', 4)
+          .attr('mask', 'url(#mask-2)')
+          .attr('xlink:href', '#path-1')
+          .attr('stroke', '#FA2F97')
+          .transition()
+          .duration(200)
+          .ease('quad')
+          .attr('stroke', '#FFFFFF')
+
+      }, 325)
+
+
+        // .transition()
+        // .duration(400)
+        // .attr('rx', 6)
+        // .attr('ry', 6)
+
+        // <use id="Oval-2-Copy-74" stroke="#FFFFFF" mask="url(#mask-2)" stroke-width="4" xlink:href="#path-1"></use>
   }, 1025)
 }
