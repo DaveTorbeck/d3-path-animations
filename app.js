@@ -11,7 +11,13 @@ function animateChart() {
   var d = pathSeven[0][0].attributes.d.value;
 
 
-  var pathSevenDotted = svg.insert('path', 'path#path-group-seven')
+  var pathSevenWhite = svg.insert('path', 'path#path-group-eight')
+    .attr('id', 'path-group-insert-white')
+    .attr('d', d)
+    .attr('stroke', '#FFFFFF')
+    .attr('stroke-width', 2)
+
+  var pathSevenDotted = svg.insert('path', 'path#path-group-eight')
     .attr('id', 'path-group-insert-two')
     .attr('d', d)
     .attr('stroke', '#FA2F97')
@@ -33,23 +39,31 @@ function animateChart() {
     .attr("stroke-dashoffset", totalLength)
     .attr('stroke-dasharray', dashArray)
     .transition()
-    .duration(1000)
-    .ease('linear')
-    .attr("stroke-dashoffset", 0);
-
-  function deleteDottedLine() {
-    requestAnimationFrame(deleteDottedLine)
-    pathSeven
-      .attr("stroke-dasharray", totalLength + " " + totalLength)
-      .transition()
-      .duration(500)
+      .duration(1000)
       .ease('linear')
-      .attr("stroke-dashoffset", totalLength);
-  }
+      .attr("stroke-dashoffset", 0);
 
-  setTimeout(function() {
-    deleteDottedLine();
-  }, 1050)
+  d3.select('path#path-group-insert-white')
+    .attr('stroke-dasharray', totalLength + ' ' + totalLength)
+    .attr("stroke-dashoffset", totalLength)
+    .transition()
+      .duration(1200)
+      .ease('linear')
+      .attr("stroke-dashoffset", 0);
+
+  // function deleteDottedLine() {
+  //   requestAnimationFrame(deleteDottedLine)
+  //   pathSeven
+  //     .attr("stroke-dasharray", totalLength + " " + totalLength)
+  //     .transition()
+  //       .duration(500)
+  //       .ease('linear')
+  //       .attr("stroke-dashoffset", totalLength);
+  // }
+
+  // setTimeout(function() {
+  //   deleteDottedLine();
+  // }, 1050)
 
   var pathTwo = svg.select('path#path-group-two');
   var d = pathTwo[0][0].attributes.d.value;
@@ -67,9 +81,9 @@ function animateChart() {
       .attr('stroke-dasharray', totalLengthTwo + " " + totalLengthTwo)
       .attr('stroke-dashoffset', totalLengthTwo)
       .transition()
-      .duration(1000)
-      .ease('linear')
-      .attr('stroke-dashoffset', 0)
+        .duration(1000)
+        .ease('linear')
+        .attr('stroke-dashoffset', 0)
 
 
 
