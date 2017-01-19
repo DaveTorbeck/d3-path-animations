@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>viewBox demo</title>
+</head>
+<body>
+  <script>
+      function animateChart() {
+
+        var line = d3.svg.line()
+            .tension(0) // Catmull–Rom
+            .interpolate("cardinal-closed");
+
+        var svg = d3.select('#Group')
+        var path = svg.select('path#Stroke-27-Copy-51');
+
+        // var d = path[0][0].attributes.d.value;
+        var d = 'M 42.6492537 71.2611547 C 62.0743079 35.3911438 93.1523356 10.4619437 143.285893 11.3986659'
+        d = SmartSVGPath.reverse(d);
+
+        var secondPath = svg.insert('path', 'path#Stroke-27-Copy-51')
+            .attr('id', 'test-path-2')
+            .attr('d', d)
+            .attr('stroke', '#FA2F97')
+            .attr('stroke-width', 2)
+
+
+
+
+        var totalLength = secondPath.node().getTotalLength();
+
+        // var path = svg.select('path#test-stroke')
+        //     .attr('stroke-dashoffset', totalLength)
+        //     .transition()
+        //     .duration(500)
+        //     .ease("linear")
+        //     .attr('stroke', '#FA2F97')
+        //     .attr('stroke-dashoffset', 0)
+
+
+        d3.select('#test-path-2')
+            .attr('stroke-dasharray', totalLength + " " + totalLength)
+            .attr('stroke-dashoffset', totalLength)
+            .transition()
+            .duration(1000)
+            .ease("linear")
+            .attr('stroke-dashoffset', 0)
+
+
+
+        setTimeout(function() {
+            svg.select('#Chart-dot-current-Copy-78')
+            .transition()
+            .duration(200)
+            .ease('linear')
+            .attr('fill', '#FA2F97')
+            .attr('stroke', '#FA2F97')
+        }, 1025)
+        
+            
+            
+            // .each("end", function() { d3.select(this).call(transition); });
+
+
+        // function tweenDash() {
+        //   var l = this.getTotalLength(),
+        //       i = d3.interpolateString("0," + l, l + "," + l);
+        //   return function(t) { return i(t); };
+        // }
+
+      }
+  </script>
+  <div style="padding-bottom: 1em">
+    <button onclick="animateChart()">Animate</button>
+  </div>
+
+  <div id="chart">
+      <svg width="299px" height="260px" viewBox="585 356 299 260" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <!-- Generator: Sketch 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
+          <desc>Created with Sketch.</desc>
+          <defs>
+              <ellipse id="path-1" cx="11.0509607" cy="11.0465677" rx="9.28280699" ry="9.27911685"></ellipse>
+              <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="18.565614" height="18.5582337" fill="white">
+                  <use xlink:href="#path-1"></use>
+              </mask>
+          </defs>
+          <g id="Group" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(585.000000, 356.000000)">
+              <path d="M252.996258,73.1423601 C233.116382,36.4200279 201.310687,10.8984752 150.003293,11.8574552" id="Stroke-27-Copy-34" stroke="#333333" stroke-width="2" stroke-dasharray="3,3"></path>
+              <path d="M143.285893,11.3986659 C93.1523356,10.4619437 62.0743079,35.3911438 42.6492537,71.2611547" id="test-stroke" stroke="#333333" stroke-width="2" stroke-dasharray="3,3"></path>
+              <path d="M104.415536,244.248764 C106.107139,219.508705 115.127157,151.066763 151.153663,135.057045" id="test-stroke-3" stroke="#C9C9C9"></path>
+              <path d="M196.74142,244.248764 C195.049817,219.508705 186.029799,151.066763 150.003293,135.057045" id="Stroke-27-Copy-51" stroke="#C9C9C9"></path>
+              <path d="M211.110285,131.528434 C219.317445,104.088336 232.594159,81.2371662 254.488772,74.8996028" id="Stroke-27-Copy-51" stroke="#C9C9C9"></path>
+              <path d="M196.561001,244.967717 C197.961325,222.234416 197.863175,172.901262 209.762551,133.116482" id="Stroke-27-Copy-51" stroke="#C9C9C9"></path>
+              <g id="Chart-dot-current-Copy-72" transform="translate(199.470858, 121.473106)" stroke="#C9C9C9" stroke-width="2" fill="#FFFFFF">
+                  <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
+              </g>
+              <g id="Chart-dot-current-Copy-75" transform="translate(139.333818, 0.187941)">
+                  <ellipse id="Oval-2-Copy-62" fill="#FA2F97" cx="11.0509607" cy="11.0465677" rx="11.0509607" ry="11.0465677"></ellipse>
+                  <use id="Oval-2-Copy-74" stroke="#FFFFFF" mask="url(#mask-2)" stroke-width="4" xlink:href="#path-1"></use>
+              </g>
+              <path d="M253.788185,73.9293215 C259.477182,79.6581505 287.518654,145.349228 287.22691,248.316543" id="Line-Copy-12" stroke="#C9C9C9"></path>
+              <path d="M45.7110567,73.9293215 C40.0220594,79.6581505 11.9805879,145.349228 12.2723313,248.316543" id="Line-Copy-13" stroke="#C9C9C9"></path>
+              <path d="M151.131199,132.483734 C128.615454,100.839373 95.2155538,74.8996028 46.2184005,74.8996028" id="Line" stroke="#C9C9C9"></path>
+              <g id="Chart-dot-current-Copy-71" transform="translate(139.333818, 121.473106)" stroke="#C9C9C9" stroke-width="2" fill="#FFFFFF">
+                  <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
+              </g>
+              <g id="Chart-dot-current-Copy-73" transform="translate(184.921574, 237.906865)" stroke="#C9C9C9" stroke-width="2" fill="#FFFFFF">
+                  <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
+              </g>
+              <g id="Chart-dot-current-Copy-74" transform="translate(92.776109, 237.906865)" stroke="#C9C9C9" stroke-width="2" fill="#FFFFFF">
+                  <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
+              </g>
+              <g id="Chart-dot-current-Copy-76" transform="translate(276.097087, 237.906865)" stroke="#C9C9C9" stroke-width="2" fill="#FFFFFF">
+                  <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
+              </g>
+              <g id="Chart-dot-current-Copy-79" transform="translate(0.630644, 237.906865)" stroke="#C9C9C9" stroke-width="2" fill="#FFFFFF">
+                  <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
+              </g>
+              <g id="Chart-dot-current-Copy-77" transform="translate(242.148758, 61.315664)" stroke="#333333" stroke-width="2" fill="#FFFFFF">
+                  <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
+              </g>
+              <g id="Chart-dot-current-Copy-78" transform="translate(34.578973, 61.315664)" stroke="#333333" stroke-width="2" fill="#FFFFFF">
+                  <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
+              </g>
+          </g>
+      </svg>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.js"></script>
+  <script src="SmartSVGPath.js"></script>
+</body>
+</html>
