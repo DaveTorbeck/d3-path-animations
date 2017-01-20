@@ -84,11 +84,11 @@ function animateChart() {
   setTimeout(function() {
       svg.select('#chart-dot-nine')
       .transition()
-      .duration(200)
-      .ease('linear')
-      .attr('fill', '#FA2F97')
-      .attr('stroke', '#FA2F97')
-      .attr('stroke-width', 0)
+        .duration(200)
+        .ease('linear')
+        .attr('fill', '#FA2F97')
+        .attr('stroke', '#FA2F97')
+        .attr('stroke-width', 0)
 
       svg.select('#chart-dot-nine ellipse')
         .transition()
@@ -97,8 +97,8 @@ function animateChart() {
         .attr('rx', 11.05)
         .attr('ry', 11.05)
         .transition()
-        .duration(300)
-        .ease('linear')
+          .duration(300)
+          .ease('linear')
 
       setTimeout(function(){
         svg.select('#chart-dot-nine')
@@ -108,9 +108,9 @@ function animateChart() {
           .attr('xlink:href', '#path-1')
           .attr('stroke', '#FA2F97')
           .transition()
-          .duration(200)
-          .ease('quad')
-          .attr('stroke', '#FFFFFF')
+            .duration(200)
+            .ease('elastic')
+            .attr('stroke', '#FFFFFF')
 
       }, 325)
 
