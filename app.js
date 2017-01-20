@@ -1,10 +1,49 @@
+var svg = d3.select('#path-group')
+
+var allPaths = svg.selectAll('path')
+
+var lastStroke;
+var lastDashArray;
+var hasDash
+
+allPaths
+  .on('mouseover', function() {
+    lastStroke = d3.select(this)[0][0].attributes.stroke.value;
+    dashArray = d3.select(this)[0][0].attributes['stroke-dasharray'];
+
+    if (dashArray) {
+      lastDashArray = dashArray.value;
+      hasDash = true;
+    } else {
+      hasDash = false;
+    }
+
+    d3.select(this)
+      .style({stroke:'#FA2F97', 'stroke-width': 4, 'stroke-dasharray': 0});
+  })
+  .on('mouseout', function() {
+    var node = d3.select(this);
+
+    node
+      .style({'stroke-width': 2})
+      .style({'stroke': lastStroke})
+
+    if (hasDash) {
+      node.style({'stroke-dasharray': lastDashArray})
+    }
+  })
+
+
+
+
+
 function animateChart() {
 
   var line = d3.svg.line()
       .tension(0) // Catmull–Rom
       .interpolate("cardinal-closed");
 
-  var svg = d3.select('#path-group')
+  
 
   var pathSeven = svg.select('path#path-group-seven');
 
