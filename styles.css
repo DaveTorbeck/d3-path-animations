@@ -1,0 +1,9 @@
+.solid-line {
+  stroke: #FA2F97;
+  stroke-dasharray: 0;
+  stroke-width: 4;
+}
+
+.dashed-line {
+  stroke-width: 2;
+}

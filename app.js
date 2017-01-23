@@ -1,74 +1,50 @@
-var svg = d3.select('#path-group')
+let svg = d3.select('#path-group')
 
-var allPaths = svg.selectAll('path')
-
-var lastStroke;
-var lastDashArray;
-var hasDash;
+let allPaths = svg.selectAll('path')
 
 allPaths
   .on('mouseover', function() {
-    let node = d3.select(this);
-
-    lastStroke = node.attr('stroke');
-    dashArray = node.attr('stroke-dasharray');
-
-    node.attr('stroke', '#FA2F97')
-        .attr('stroke-width', 4)
-        .attr('stroke-dasharray', 0);
-
-    if (dashArray) {
-      lastDashArray = dashArray;
-      hasDash = true;
-    } else {
-      hasDash = false;
-    }
+    d3.select(this)
+      .classed('solid-line', true);
   })
   .on('mouseout', function() {
-    var node = d3.select(this);
-
-    node
-      .attr('stroke-width', 2)
-      .attr('stroke', lastStroke)
-
-    if(hasDash) {
-      node.attr('stroke-dasharray', lastDashArray)
-    }
-  })
-
-
-
-
+    d3.select(this)
+      .classed('solid-line', false);
+  });
 
 function animateChart() {
-  var pathSeven = svg.select('path#path-group-seven');
-  var d = pathSeven.attr('d');
+  animateSevenPath();
 
-  var pathSevenWhite = svg.insert('path', 'path#path-group-eight')
+  animateTwoPath();
+}
+
+function animateSevenPath() {
+  let pathSeven = svg.select('#path-group-seven');
+  let d = pathSeven.attr('d');
+
+  let pathSevenWhite = svg.insert('path', 'path#path-group-eight')
     .attr('id', 'path-group-insert-white')
     .attr('d', d)
     .attr('stroke', '#FFFFFF')
     .attr('stroke-width', 2)
 
-  var pathSevenDotted = svg.insert('path', 'path#path-group-eight')
+  let pathSevenDotted = svg.insert('path', 'path#path-group-eight')
     .attr('id', 'path-group-insert-two')
     .attr('d', d)
     .attr('stroke', '#FA2F97')
     .attr('stroke-width', 2)
 
+  let totalLength = pathSeven.node().getTotalLength();
 
-
-  var totalLength = pathSeven.node().getTotalLength();
-
-  var dashing = '3, 3';
-  var dashLength = dashing
+  let dashing = '3, 3';
+  let dashLength = dashing
                     .split(/[\s,]/)
                     .map((a) => parseFloat(a) || 0 )
                     .reduce((a, b) => a + b );
 
-  var dashCount = Math.ceil( totalLength / dashLength );
-  var newDashes = new Array(dashCount).join( dashing + " " );
-  var dashArray = newDashes + " 0, " + totalLength;
+  let dashCount = Math.ceil( totalLength / dashLength );
+  let newDashes = new Array(dashCount).join( dashing + " " );
+  let dashArray = newDashes + " 0, " + totalLength;
 
   d3.select('path#path-group-insert-two')
     .attr('stroke-dashoffset', totalLength)
@@ -84,7 +60,7 @@ function animateChart() {
     .transition()
       .duration(1200)
       .ease(d3.easeLinear)
-      .attr("stroke-dashoffset", 0);
+      .attr('stroke-dashoffset', 0);
 
   d3.select('#chart-dot-six')
     .transition()
@@ -92,11 +68,13 @@ function animateChart() {
     .attr('fill', '#FA2F97')
     .attr('stroke', '#FA2F97')
     .attr('stroke-width', 0)
+}
 
-  var pathTwo = svg.select('path#path-group-two');
+function animateTwoPath() {
+  var pathTwo = svg.select('#path-group-two');
   var d = pathTwo.attr('d');
 
-  var secondPath = svg.insert('path', 'path#path-group-three')
+  var secondPath = svg.insert('path', '#path-group-three')
       .attr('id', 'path-group-insert-one')
       .attr('d', d)
       .attr('stroke', '#FA2F97')
@@ -104,7 +82,7 @@ function animateChart() {
 
   var totalLengthTwo = secondPath.node().getTotalLength();
 
-  d3.select('path#path-group-insert-one')
+  svg.select('#path-group-insert-one')
       .attr('stroke-dasharray', totalLengthTwo + " " + totalLengthTwo)
       .attr('stroke-dashoffset', totalLengthTwo)
       .transition()
@@ -112,42 +90,46 @@ function animateChart() {
         .ease(d3.easeLinear)
         .attr('stroke-dashoffset', 0)
 
+  expandEllipsis('#chart-dot-nine')
+}
+
+function expandEllipsis(targetDot, delay = 1025) {
   setTimeout(function() {
-      svg.select('#chart-dot-nine')
+    svg.select(targetDot)
+    .transition()
+      .duration(200)
+      // .ease(d3.easeLinear)
+      .attr('fill', '#FA2F97')
+      .attr('stroke', '#FA2F97')
+      .attr('stroke-width', 0)
+
+    svg.select(`${targetDot} ellipse`)
+      .transition()
+        .duration(300)
+        // .ease(d3.easeLinear)
+        .attr('rx', 11.05)
+        .attr('ry', 11.05)
+      .transition()
+        .duration(300)
+        .delay(300)
+        .attr('rx', 6.77)
+        .attr('ry', 6.67)
+
+    svg.select(targetDot)
+      .append('use')
+      .attr('stroke-width', 4)
+      .attr('mask', 'url(#mask-2)')
+      .attr('xlink:href', '#path-1')
+      .attr('stroke', '#FA2F97')
       .transition()
         .duration(200)
+        .delay(200)
+        // .ease(d3.easeBounceInOut)
+        .attr('stroke', '#FFFFFF')
+      .transition()
+        // .duration(400)
+        .delay(205)
         // .ease(d3.easeLinear)
-        .attr('fill', '#FA2F97')
-        .attr('stroke', '#FA2F97')
-        .attr('stroke-width', 0)
-
-      svg.select('#chart-dot-nine ellipse')
-        .transition()
-          .duration(300)
-          // .ease(d3.easeLinear)
-          .attr('rx', 11.05)
-          .attr('ry', 11.05)
-        .transition()
-          .duration(300)
-          .delay(300)
-          .attr('rx', 6.77)
-          .attr('ry', 6.67)
-
-      svg.select('#chart-dot-nine')
-        .append('use')
-        .attr('stroke-width', 4)
-        .attr('mask', 'url(#mask-2)')
-        .attr('xlink:href', '#path-1')
-        .attr('stroke', '#FA2F97')
-        .transition()
-          .duration(200)
-          .delay(200)
-          // .ease(d3.easeBounceInOut)
-          .attr('stroke', '#FFFFFF')
-        .transition()
-          // .duration(400)
-          .delay(205)
-          // .ease(d3.easeLinear)
-          .remove()
-  }, 1025)
+        .remove()
+  }, delay)
 }
