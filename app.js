@@ -1,6 +1,6 @@
-let svg = d3.select('#path-group')
+const svg = d3.select('#path-group')
 
-let allPaths = svg.selectAll('path')
+const allPaths = svg.selectAll('path')
 
 allPaths
   .on('mouseover', function() {
@@ -18,33 +18,35 @@ function animateChart() {
   animateTwoPath();
 }
 
+// This animates with dotted line, allow more abstract class targeting
 function animateSevenPath() {
-  let pathSeven = svg.select('#path-group-seven');
-  let d = pathSeven.attr('d');
+  const path = svg.select('#path-group-seven');
+  const d = path.attr('d');
+  const endNode = path.attr('data-end-node');
 
-  let pathSevenWhite = svg.insert('path', 'path#path-group-eight')
+  const pathWhite = svg.insert('path', 'path#path-group-eight')
     .attr('id', 'path-group-insert-white')
     .attr('d', d)
     .attr('stroke', '#FFFFFF')
     .attr('stroke-width', 2)
 
-  let pathSevenDotted = svg.insert('path', 'path#path-group-eight')
+  const pathDotted = svg.insert('path', 'path#path-group-eight')
     .attr('id', 'path-group-insert-two')
     .attr('d', d)
     .attr('stroke', '#FA2F97')
     .attr('stroke-width', 2)
 
-  let totalLength = pathSeven.node().getTotalLength();
+  const totalLength = path.node().getTotalLength();
 
-  let dashing = '3, 3';
-  let dashLength = dashing
+  const dashing = '3, 3';
+  const dashLength = dashing
                     .split(/[\s,]/)
                     .map((a) => parseFloat(a) || 0 )
                     .reduce((a, b) => a + b );
 
-  let dashCount = Math.ceil( totalLength / dashLength );
-  let newDashes = new Array(dashCount).join( dashing + " " );
-  let dashArray = newDashes + " 0, " + totalLength;
+  const dashCount = Math.ceil( totalLength / dashLength );
+  const newDashes = new Array(dashCount).join( dashing + " " );
+  const dashArray = newDashes + " 0, " + totalLength;
 
   d3.select('path#path-group-insert-two')
     .attr('stroke-dashoffset', totalLength)
@@ -54,7 +56,7 @@ function animateSevenPath() {
       .ease(d3.easeLinear)
       .attr('stroke-dashoffset', 0);
 
-  d3.select('path#path-group-insert-white')
+  d3.select('#path-group-insert-white')
     .attr('stroke-dasharray', totalLength + ' ' + totalLength)
     .attr('stroke-dashoffset', totalLength)
     .transition()
@@ -62,35 +64,33 @@ function animateSevenPath() {
       .ease(d3.easeLinear)
       .attr('stroke-dashoffset', 0);
 
-  d3.select('#chart-dot-six')
-    .transition()
-    .delay(1100)
-    .attr('fill', '#FA2F97')
-    .attr('stroke', '#FA2F97')
-    .attr('stroke-width', 0)
+  fillInDot(`#${endNode}`);
 }
 
+// This animates solid line
 function animateTwoPath() {
-  var pathTwo = svg.select('#path-group-two');
-  var d = pathTwo.attr('d');
+  const duration = 1000;
+  const path = svg.select('#path-group-two');
+  const d = path.attr('d');
+  const endNode = path.attr('data-end-node');
 
-  var secondPath = svg.insert('path', '#path-group-three')
+  const secondPath = svg.insert('path', '#path-group-three')
       .attr('id', 'path-group-insert-one')
       .attr('d', d)
       .attr('stroke', '#FA2F97')
       .attr('stroke-width', 2)
 
-  var totalLengthTwo = secondPath.node().getTotalLength();
+  const totalLengthTwo = secondPath.node().getTotalLength();
 
   svg.select('#path-group-insert-one')
       .attr('stroke-dasharray', totalLengthTwo + " " + totalLengthTwo)
       .attr('stroke-dashoffset', totalLengthTwo)
       .transition()
-        .duration(1000)
+        .duration(duration)
         .ease(d3.easeLinear)
         .attr('stroke-dashoffset', 0)
 
-  expandEllipsis('#chart-dot-nine')
+  expandEllipsis(`#${endNode}`, duration + 25)
 }
 
 function expandEllipsis(targetDot, delay = 1025) {
@@ -132,4 +132,13 @@ function expandEllipsis(targetDot, delay = 1025) {
         // .ease(d3.easeLinear)
         .remove()
   }, delay)
+}
+
+function fillInDot(targetDot, delay = 1100) {
+  d3.select(targetDot)
+    .transition()
+    .delay(1100)
+    .attr('fill', '#FA2F97')
+    .attr('stroke', '#FA2F97')
+    .attr('stroke-width', 0)
 }
