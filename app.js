@@ -41,15 +41,8 @@ allPaths
 
 
 function animateChart() {
-
-  // var line = d3.svg.line()
-  //     .tension(0) // Catmull–Rom
-  //     .interpolate("cardinal-closed");
-
   var pathSeven = svg.select('path#path-group-seven');
-
   var d = pathSeven.attr('d');
-
 
   var pathSevenWhite = svg.insert('path', 'path#path-group-eight')
     .attr('id', 'path-group-insert-white')
@@ -62,6 +55,8 @@ function animateChart() {
     .attr('d', d)
     .attr('stroke', '#FA2F97')
     .attr('stroke-width', 2)
+
+
 
   var totalLength = pathSeven.node().getTotalLength();
 
@@ -80,7 +75,7 @@ function animateChart() {
     .attr('stroke-dasharray', dashArray)
     .transition()
       .duration(1000)
-      .ease('linear')
+      .ease(d3.easeLinear)
       .attr('stroke-dashoffset', 0);
 
   d3.select('path#path-group-insert-white')
@@ -88,12 +83,18 @@ function animateChart() {
     .attr('stroke-dashoffset', totalLength)
     .transition()
       .duration(1200)
-      .ease('linear')
+      .ease(d3.easeLinear)
       .attr("stroke-dashoffset", 0);
 
+  d3.select('#chart-dot-six')
+    .transition()
+    .delay(1100)
+    .attr('fill', '#FA2F97')
+    .attr('stroke', '#FA2F97')
+    .attr('stroke-width', 0)
+
   var pathTwo = svg.select('path#path-group-two');
-  var d = pathTwo[0][0].attributes.d.value;
-  // d = SmartSVGPath.reverse(d);
+  var d = pathTwo.attr('d');
 
   var secondPath = svg.insert('path', 'path#path-group-three')
       .attr('id', 'path-group-insert-one')
@@ -108,41 +109,45 @@ function animateChart() {
       .attr('stroke-dashoffset', totalLengthTwo)
       .transition()
         .duration(1000)
-        .ease('linear')
+        .ease(d3.easeLinear)
         .attr('stroke-dashoffset', 0)
 
   setTimeout(function() {
       svg.select('#chart-dot-nine')
       .transition()
         .duration(200)
-        .ease('linear')
+        // .ease(d3.easeLinear)
         .attr('fill', '#FA2F97')
         .attr('stroke', '#FA2F97')
         .attr('stroke-width', 0)
 
       svg.select('#chart-dot-nine ellipse')
         .transition()
-        .duration(300)
-        .ease('linear')
-        .attr('rx', 11.05)
-        .attr('ry', 11.05)
+          .duration(300)
+          // .ease(d3.easeLinear)
+          .attr('rx', 11.05)
+          .attr('ry', 11.05)
         .transition()
           .duration(300)
-          .ease('linear')
+          .delay(300)
+          .attr('rx', 6.77)
+          .attr('ry', 6.67)
 
-      //TODO: change to use .delay()
-      setTimeout(function(){
-        svg.select('#chart-dot-nine')
-          .append('use')
-          .attr('stroke-width', 4)
-          .attr('mask', 'url(#mask-2)')
-          .attr('xlink:href', '#path-1')
-          .attr('stroke', '#FA2F97')
-          .transition()
-            .duration(200)
-            .ease('elastic')
-            .attr('stroke', '#FFFFFF')
-
-      }, 325)
+      svg.select('#chart-dot-nine')
+        .append('use')
+        .attr('stroke-width', 4)
+        .attr('mask', 'url(#mask-2)')
+        .attr('xlink:href', '#path-1')
+        .attr('stroke', '#FA2F97')
+        .transition()
+          .duration(200)
+          .delay(200)
+          // .ease(d3.easeBounceInOut)
+          .attr('stroke', '#FFFFFF')
+        .transition()
+          // .duration(400)
+          .delay(205)
+          // .ease(d3.easeLinear)
+          .remove()
   }, 1025)
 }
