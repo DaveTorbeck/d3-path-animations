@@ -4,32 +4,35 @@ var allPaths = svg.selectAll('path')
 
 var lastStroke;
 var lastDashArray;
-var hasDash
+var hasDash;
 
 allPaths
   .on('mouseover', function() {
-    lastStroke = d3.select(this)[0][0].attributes.stroke.value;
-    dashArray = d3.select(this)[0][0].attributes['stroke-dasharray'];
+    let node = d3.select(this);
+
+    lastStroke = node.attr('stroke');
+    dashArray = node.attr('stroke-dasharray');
+
+    node.attr('stroke', '#FA2F97')
+        .attr('stroke-width', 4)
+        .attr('stroke-dasharray', 0);
 
     if (dashArray) {
-      lastDashArray = dashArray.value;
+      lastDashArray = dashArray;
       hasDash = true;
     } else {
       hasDash = false;
     }
-
-    d3.select(this)
-      .style({stroke:'#FA2F97', 'stroke-width': 4, 'stroke-dasharray': 0});
   })
   .on('mouseout', function() {
     var node = d3.select(this);
 
     node
-      .style({'stroke-width': 2})
-      .style({'stroke': lastStroke})
+      .attr('stroke-width', 2)
+      .attr('stroke', lastStroke)
 
-    if (hasDash) {
-      node.style({'stroke-dasharray': lastDashArray})
+    if(hasDash) {
+      node.attr('stroke-dasharray', lastDashArray)
     }
   })
 
@@ -39,15 +42,13 @@ allPaths
 
 function animateChart() {
 
-  var line = d3.svg.line()
-      .tension(0) // Catmull–Rom
-      .interpolate("cardinal-closed");
-
-  
+  // var line = d3.svg.line()
+  //     .tension(0) // Catmull–Rom
+  //     .interpolate("cardinal-closed");
 
   var pathSeven = svg.select('path#path-group-seven');
 
-  var d = pathSeven[0][0].attributes.d.value;
+  var d = pathSeven.attr('d');
 
 
   var pathSevenWhite = svg.insert('path', 'path#path-group-eight')
@@ -67,8 +68,8 @@ function animateChart() {
   var dashing = '3, 3';
   var dashLength = dashing
                     .split(/[\s,]/)
-                    .map(function(a) { return parseFloat(a) || 0 })
-                    .reduce(function(a, b) { return a + b });
+                    .map((a) => parseFloat(a) || 0 )
+                    .reduce((a, b) => a + b );
 
   var dashCount = Math.ceil( totalLength / dashLength );
   var newDashes = new Array(dashCount).join( dashing + " " );
@@ -89,16 +90,6 @@ function animateChart() {
       .duration(1200)
       .ease('linear')
       .attr("stroke-dashoffset", 0);
-
-  // function deleteDottedLine() {
-  //   requestAnimationFrame(deleteDottedLine)
-  //   pathSeven
-  //     .attr("stroke-dasharray", totalLength + " " + totalLength)
-  //     .transition()
-  //       .duration(500)
-  //       .ease('linear')
-  //       .attr("stroke-dashoffset", totalLength);
-  // }
 
   var pathTwo = svg.select('path#path-group-two');
   var d = pathTwo[0][0].attributes.d.value;
@@ -139,6 +130,7 @@ function animateChart() {
           .duration(300)
           .ease('linear')
 
+      //TODO: change to use .delay()
       setTimeout(function(){
         svg.select('#chart-dot-nine')
           .append('use')
@@ -152,13 +144,5 @@ function animateChart() {
             .attr('stroke', '#FFFFFF')
 
       }, 325)
-
-
-        // .transition()
-        // .duration(400)
-        // .attr('rx', 6)
-        // .attr('ry', 6)
-
-        // <use id="Oval-2-Copy-74" stroke="#FFFFFF" mask="url(#mask-2)" stroke-width="4" xlink:href="#path-1"></use>
   }, 1025)
 }
