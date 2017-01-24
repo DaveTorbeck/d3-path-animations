@@ -1,9 +1,29 @@
-.solid-line {
+.highlight-line {
   stroke: #FA2F97;
-  stroke-dasharray: 0;
+  /*stroke-dasharray: 0;*/
   stroke-width: 4;
 }
 
 .dashed-line {
   stroke-width: 2;
+  stroke-dasharray: 3, 3;
+  stroke: #333333;
+}
+
+
+.buttons-container {
+  min-height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  width: 400px;
+  justify-content: space-between;
+}
+
+.buttons-container > button {
+  display: flex;
+  flex-basis: calc(50% - 40px);  
+  justify-content: center;
+  flex-direction: column;
+  margin: 50px 0 50px 0;
 }

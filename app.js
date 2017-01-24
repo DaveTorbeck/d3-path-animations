@@ -1,45 +1,59 @@
 const svg = d3.select('#path-group');
-const answerOne = d3.select('.answer-one');
-const answerTwo = d3.select('.answer-two');
 
-answerOne.on('click', () =>  animatePath('path-one'));
-;
+let isAnimating = false;
 
-answerTwo.on('click', () => animatePath('path-two'));
+init();
 
-answerOne
-  .on('mouseenter', () => {
-    svg
-      .select(`#path-one`)
-      .classed('solid-line', true);
-  })
-  .on('mouseleave', () => {
-    svg
-      .select(`#path-one`)
-      .classed('solid-line', false);
-  });
+function init() {
+  const answerOne = d3.select('.answer-one');
+  const answerTwo = d3.select('.answer-two');
 
-answerTwo
-  .on('mouseenter', () => {
-    svg
-      .select(`#path-two`)
-      .classed('solid-line', true);
-  })
-  .on('mouseleave', () => {
-    svg
-      .select(`#path-two`)
-      .classed('solid-line', false);
-  });
+  addListeners(answerOne);
+  addListeners(answerTwo)
+}
 
-function animatePath(selectedPath) {
+
+function addListeners(button) {
+  const pathName = '#' + button.attr('data-path');
+  const path = d3.select(pathName)
+  const endNode = path.attr('data-end-node');
+
+  button.on('click', () =>  animatePath(path));
+
+  button
+    .on('mouseenter', () => {
+      if (!isAnimating) {
+        path.classed('highlight-line', true);
+
+        fillInDot(endNode, 0);
+      }
+    })
+    .on('mouseleave', () => {
+      path.classed('highlight-line', false);
+
+      unfillDot(endNode)
+    });
+
+}
+
+function animatePath(path) {
   const duration = 1000;
-  const path = svg.select(`#${selectedPath}`);
   const d = path.attr('d');
   const endNode = path.attr('data-end-node');
   const totalLength = path.node().getTotalLength();
 
+  isAnimating = true;
 
-  svg.insert('path', `#${selectedPath} + *`)
+  // Reset path from hover event
+  path
+    .classed('dashed-line', true);
+
+  // TODO: Can this be done as a css class toggle instead?
+  unfillDot(endNode)
+
+  // debugger;
+
+  svg.insert('path', `#${path.attr('id')} + *`)
       .attr('d', d)
       .attr('stroke', '#FA2F97')
       .attr('stroke-width', 2)
@@ -143,9 +157,21 @@ function expandEllipsis(targetNode, delay = 1025) {
   }, delay)
 }
 
-function fillInDot(targetNode, delay = 1100) {
+// TODO: Make it so transition is based on parameter
+function fillInDot(targetNode, delay = 0) {
   d3.select(`#${targetNode}`)
     .transition()
-    .delay(1100)
+    .delay(delay)
     .attr('fill', '#FA2F97')
+    .on('end', function() {
+      isAnimating = false;
+    });
+}
+
+function unfillDot(targetNode, delay = 0) {
+  d3.select(`#${targetNode}`)
+    .attr('fill', '#FFFFFF')
+    .on('end', function() {
+      isAnimating = false;
+    });
 }
