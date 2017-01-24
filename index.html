@@ -21,7 +21,16 @@
               </mask>
           </defs>
           <g id="path-group" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(585.000000, 356.000000)">
-              <path id="path-one" class="choice-a" d="M143.285893,11.3986659 C93.1523356,10.4619437 62.0743079,35.3911438 42.6492537,71.2611547"  stroke="#333333" stroke-width="2" stroke-dasharray="3,3" data-start-node="chart-dot-two" data-end-node="chart-dot-nine"></path>
+              <path
+                id="path-one"
+                data-start-node="chart-dot-two"
+                data-end-node="chart-dot-nine"
+                stroke="#333333"
+                stroke-width="2"
+                stroke-dasharray="3,3"
+                d="M143.285893,11.3986659 C93.1523356,10.4619437 62.0743079,35.3911438 42.6492537,71.2611547"
+              >
+              </path>
               <path id="path-two" d="M 150.003293 11.8574552 C 201.310687 10.8984752 233.116382 36.4200279 252.996258 73.1423601"  stroke="#333333" stroke-width="2" stroke-dasharray="3,3" data-end-node="chart-dot-eight"></path>
               <path id="path-three" d="M104.415536,244.248764 C106.107139,219.508705 115.127157,151.066763 151.153663,135.057045"  stroke="#C9C9C9"></path>
               <path d="M196.74142,244.248764 C195.049817,219.508705 186.029799,151.066763 150.003293,135.057045" id="path-four" stroke="#C9C9C9"></path>
@@ -35,8 +44,22 @@
                   <use id="Oval-2-Copy-74" stroke="#FFFFFF" mask="url(#mask-2)" stroke-width="4" xlink:href="#path-1"></use>
               </g>
               <path id="path-seven" data-start-node="chart-dot-eight" data-end-node="chart-dot-six" d="M253.788185,73.9293215 C259.477182,79.6581505 287.518654,145.349228 287.22691,248.316543"  stroke="#C9C9C9"></path>
-              <path id="path-eight" d="M45.7110567,73.9293215 C40.0220594,79.6581505 11.9805879,145.349228 12.2723313,248.316543"  stroke="#C9C9C9"></path>
-              <path id="path-nine" d="M151.131199,132.483734 C128.615454,100.839373 95.2155538,74.8996028 46.2184005,74.8996028"  stroke="#C9C9C9"></path>
+              <path
+                id="path-eight"
+                data-start-node="chart-dot-nine"
+                data-end-node="chart-dot-seven"
+                stroke="#C9C9C9"
+                d="M45.7110567,73.9293215 C40.0220594,79.6581505 11.9805879,145.349228 12.2723313,248.316543"
+              >
+              </path>
+              <path
+                id="path-nine"
+                data-start-node="chart-dot-nine"
+                data-end-node="chart-dot-three"
+                stroke="#C9C9C9"
+                d="M151.131199,132.483734 C128.615454,100.839373 95.2155538,74.8996028 46.2184005,74.8996028"
+              >
+              </path>
               <g id="chart-dot-three" transform="translate(139.333818, 121.473106)" stroke="#C9C9C9" stroke-width="2" fill="#FFFFFF" data-filled="false">
                   <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
               </g>
@@ -55,8 +78,17 @@
               <g id="chart-dot-eight" transform="translate(242.148758, 61.315664)" stroke="#333333" stroke-width="2" fill="#FFFFFF" data-filled="false">
                   <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
               </g>
-              <g id="chart-dot-nine" transform="translate(34.578973, 61.315664)" stroke="#333333" stroke-width="2" fill="#FFFFFF" data-filled="false">
-                  <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
+              <g
+                id="chart-dot-nine"
+                data-path-one="path-eight"
+                data-path-two="path-nine"
+                data-filled="false"
+                transform="translate(34.578973, 61.315664)"
+                stroke="#333333"
+                stroke-width="2"
+                fill="#FFFFFF"
+              >
+                <ellipse id="Oval-2-Copy-83" cx="11.0509607" cy="11.0465677" rx="6.63057642" ry="6.62794061"></ellipse>
               </g>
           </g>
       </svg>
@@ -69,7 +101,6 @@
     <button class="next">Next</button> 
     <button class="reset" onclick="reset()">Reset</button>
   </div>
-  
   <script src="//d3js.org/d3.v4.min.js"></script>
   <script src="app.js"></script>
   <script src="SmartSVGPath.js"></script>
