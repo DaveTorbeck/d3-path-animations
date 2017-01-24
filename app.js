@@ -1,15 +1,16 @@
 const svg = d3.select('#path-group');
+const answerOneBtn = d3.select('.answer-one');
+const answerTwoBtn = d3.select('.answer-two');
+const prevBtn = d3.select('previous');
+const nextBtn = d3.select('next');
+
+let selectedPath;
 
 let isAnimating = false;
 
 init();
 
 function init() {
-  const answerOneBtn = d3.select('.answer-one');
-  const answerTwoBtn = d3.select('.answer-two');
-  const prevBtn = d3.select('previous');
-  const nextBtn = d3.select('next')
-
   addAnswerListeners(answerOneBtn);
   addAnswerListeners(answerTwoBtn);
 
@@ -17,13 +18,23 @@ function init() {
   addNavListeners(nextBtn);
 }
 
+function reset() {
+  const drawnPath = d3.select(`#${selectedPath.attr('id')}-draw-line`);
+  const endNode = d3.select('#' + selectedPath.attr('data-end-node'));
+
+  drawnPath.remove();
+  unfillDot(endNode);
+}
 
 function addAnswerListeners(button) {
   const pathName = '#' + button.attr('data-path');
   const path = d3.select(pathName)
   const endNode = d3.select('#' + path.attr('data-end-node'));
 
-  button.on('click', () =>  animateAnswerPath(path));
+  button.on('click', () =>  {
+    selectedPath = path;
+    animateAnswerPath(path)
+  });
 
   button
     .on('mouseenter', mouseEnterAnswer)
@@ -32,7 +43,7 @@ function addAnswerListeners(button) {
   function mouseEnterAnswer() {
     if (!isAnimating) {
       path.classed('highlight-line', true);
-      fillInDot(endNode, 0, false);
+      fillInDot({targetNode: endNode});
     }
   }
 
@@ -52,22 +63,18 @@ function addNavListeners(button) {
 }
 
 function animateAnswerPath(path) {
-  const pathId = '#' + path.attr('id');
+  const pathId = path.attr('id');
   const duration = 1000;
   const d = path.attr('d');
-  const endNode = d3.select('#' + path.attr('data-end-node'));
-  const totalLength = path.node().getTotalLength();
-
-  isAnimating = true;
-
-  // Reset path from hover event
+  const endNode = d3.select('#' + path.attr('data-end-node')); const totalLength = path.node().getTotalLength(); isAnimating = true; // Reset path from hover event
   path
     .classed('dashed-line', true);
 
   // TODO: Can this be done as a css class toggle instead?
   unfillDot(endNode)
 
-  svg.insert('path', `${pathId} + *`)
+  svg.insert('path', `#${pathId} + *`)
+      .attr('id', `${pathId}-draw-line`)
       .attr('d', d)
       .attr('stroke', '#FA2F97')
       .attr('stroke-width', 2)
@@ -78,7 +85,12 @@ function animateAnswerPath(path) {
         .ease(d3.easeLinear)
         .attr('stroke-dashoffset', 0);
 
-  fillInDot(endNode, duration + 10, true);
+  fillInDot({
+    targetNode: endNode,
+    delay: duration + 10,
+    transition: true,
+    filled: true
+  });
 }
 
 function expandEllipsis(targetNode, delay = 1025) {
@@ -123,8 +135,7 @@ function expandEllipsis(targetNode, delay = 1025) {
   }, delay)
 }
 
-// TODO: Maybe pass an object instead of multiple params
-function fillInDot(targetNode, delay = 0, transition = true, filled = false) {
+function fillInDot({targetNode = {}, delay = 0, transition = false, filled = false} = {}) {
   if (transition) {
     targetNode
       .transition()
@@ -192,5 +203,5 @@ function animateSevenPath() {
       .ease(d3.easeLinear)
       .attr('stroke-dashoffset', 0);
 
-  fillInDot(endNode);
+  fillInDot({targetNode: endNode});
 }
