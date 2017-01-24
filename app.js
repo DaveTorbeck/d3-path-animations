@@ -1,21 +1,35 @@
-const svg = d3.select('#path-group')
+const svg = d3.select('#path-group');
+const answerOne = d3.select('.answer-one');
+const answerTwo = d3.select('.answer-two');
 
+answerOne.on('click', () =>  animatePath('path-one'));
+;
 
+answerTwo.on('click', () => animatePath('path-two'));
 
-// TODO: Implement hover over answer
-// const allPaths = svg.selectAll('path')
+answerOne
+  .on('mouseenter', () => {
+    svg
+      .select(`#path-one`)
+      .classed('solid-line', true);
+  })
+  .on('mouseleave', () => {
+    svg
+      .select(`#path-one`)
+      .classed('solid-line', false);
+  });
 
-function highlightPath(selectedPath) {
-  svg
-    .select(`#${selectedPath}`)
-    .classed('solid-line', true);
-}
-
-function unhighlightPath(selectedPath) {
-  svg
-    .select(`#${selectedPath}`)
-    .classed('solid-line', false);
-}
+answerTwo
+  .on('mouseenter', () => {
+    svg
+      .select(`#path-two`)
+      .classed('solid-line', true);
+  })
+  .on('mouseleave', () => {
+    svg
+      .select(`#path-two`)
+      .classed('solid-line', false);
+  });
 
 function animatePath(selectedPath) {
   const duration = 1000;
