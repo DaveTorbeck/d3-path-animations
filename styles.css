@@ -10,6 +10,10 @@
   stroke: #333333;
 }
 
+.filled-dot {
+  stroke: #FA2F97;
+}
+
 
 .buttons-container {
   min-height: 100%;

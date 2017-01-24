@@ -5,43 +5,53 @@ let isAnimating = false;
 init();
 
 function init() {
-  const answerOne = d3.select('.answer-one');
-  const answerTwo = d3.select('.answer-two');
+  const answerOneBtn = d3.select('.answer-one');
+  const answerTwoBtn = d3.select('.answer-two');
+  const prevBtn = d3.select('previous');
+  const nextBtn = d3.select('next')
 
-  addListeners(answerOne);
-  addListeners(answerTwo)
+  addAnswerListeners(answerOneBtn);
+  addAnswerListeners(answerTwoBtn);
+
+  addNavListeners(prevBtn);
+  addNavListeners(nextBtn);
 }
 
 
-function addListeners(button) {
+function addAnswerListeners(button) {
   const pathName = '#' + button.attr('data-path');
   const path = d3.select(pathName)
   const endNode = d3.select('#' + path.attr('data-end-node'));
 
-  button.on('click', () =>  animatePath(path));
+  button.on('click', () =>  animateAnswerPath(path));
 
   button
     .on('mouseenter', mouseEnterAnswer)
-    .on('mouseleave', mouseLeaveAnswer);
+    .on('mouseout', mouseOutAnswer);
 
   function mouseEnterAnswer() {
     if (!isAnimating) {
       path.classed('highlight-line', true);
-
-      fillInDot(endNode, 0);
+      fillInDot(endNode, 0, false);
     }
   }
 
-  function mouseLeaveAnswer() {
-    const isNodeFull = endNode.attr('data-filled');
+  function mouseOutAnswer() {
+    const isNodeFull = endNode.attr('data-filled') === 'true' ? true : false;
+
     if (!isNodeFull) {
       path.classed('highlight-line', false);
       unfillDot(endNode)
+
     }
   }
 }
 
-function animatePath(path) {
+function addNavListeners(button) {
+
+}
+
+function animateAnswerPath(path) {
   const pathId = '#' + path.attr('id');
   const duration = 1000;
   const d = path.attr('d');
@@ -113,21 +123,25 @@ function expandEllipsis(targetNode, delay = 1025) {
   }, delay)
 }
 
-// TODO: Make it so transition is based on parameter
-// Maybe pass an object instead of multiple params
-function fillInDot(targetNode, delay = 0, filled = false) {
-  targetNode
-    .transition()
-    .delay(delay)
-    .attr('fill', '#FA2F97')
-    .attr('data-filled', filled)
-    .on('end', () => isAnimating = false)
+// TODO: Maybe pass an object instead of multiple params
+function fillInDot(targetNode, delay = 0, transition = true, filled = false) {
+  if (transition) {
+    targetNode
+      .transition()
+      .delay(delay)
+      .style('fill', '#FA2F97')
+      .attr('data-filled', filled)
+      .on('end', () => isAnimating = false)
+  } else {
+    targetNode
+      .style('fill', '#FA2F97')
+  }
 }
 
 // TODO: Maybe combine this as a toggle function with fillInDot
 function unfillDot(targetNode) {
   targetNode
-    .attr('fill', '#FFFFFF')
+    .style('fill', '#FFFFFF')
     .on('end', () => isAnimating = false)
 }
 
