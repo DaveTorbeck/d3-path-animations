@@ -42,34 +42,36 @@
         .on('click', onClick)
         .on('mouseenter', mouseEnterAnswer)
         .on('mouseout', mouseOutAnswer);
+    });
 
-      function onClick() {
-        reset();
-        selectedPath = path;
-        animateAnswerPath(path)
+    function onClick() {
+      reset();
+      selectedPath = path;
+      animateAnswerPath(path)
+    }
+
+    function mouseEnterAnswer() {
+      if (!isAnimating) {
+        path.classed('highlight-line', true);
+        fillInDot({targetNode: endNode});
       }
+    }
 
-      function mouseEnterAnswer() {
-        if (!isAnimating) {
-          path.classed('highlight-line', true);
-          fillInDot({targetNode: endNode});
-        }
+    function mouseOutAnswer() {
+      const isNodeFull = endNode.attr('data-filled') === 'true' ? true : false;
+
+      if (!isNodeFull) {
+        path.classed('highlight-line', false);
+        unfillDot(endNode)
       }
-
-      function mouseOutAnswer() {
-        const isNodeFull = endNode.attr('data-filled') === 'true' ? true : false;
-
-        if (!isNodeFull) {
-          path.classed('highlight-line', false);
-          unfillDot(endNode)
-        }
-      }
-    })
+    }
   }
 
   // TODO: Implement
   function addNavListeners(button) {
-    button.on('click', () => {
+    button.on('click', onClick);
+
+    function onClick() {
       if (selectedPath !== null) {
         const notChosenPath = d3.select('#' + answerTwoBtn.attr('data-path'));
         const animatedPath = selectedPath;
@@ -80,12 +82,13 @@
         answerOneBtn.attr('data-path', currentNode.attr('data-path-one'));
         answerTwoBtn.attr('data-path', currentNode.attr('data-path-two'));
 
-        addAnswerListeners()
+        addAnswerListeners();
+
         reset();
 
         animateAnswerPath(animatedPath, true);
       }
-    })
+    }
   }
 
   function animateAnswerPath(path, expandNode = false) {
@@ -140,7 +143,15 @@
       .style('stroke', '#C9C9C9')
       .style('stroke-dasharray', 0)
       .style('stroke-width', 1);
+  }
 
+  function animateBlackDotted() {
+    const path = svg.select('#path-nine');
+    
+    let newPath = path.attr('')
+
+
+      
   }
 
   function fillInDot({targetNode = {}, delay = 0, transition = false, filled = false} = {}) {
@@ -200,11 +211,22 @@
           .delay(200)
           // .ease(d3.easeBounceInOut)
           .attr('stroke', '#FFFFFF')
+        .on('end', () => isAnimating = false)
     }, delay)
   }
 
 
+function clonePathAndInsert(path) {
 
+  // const attributes= path.node().attributes;
+
+  // const clonedPath = svg.insert('path', `#${path.attr('id')} + *`)
+  //                       .attr('id', `${path.attr('id')}-draw-line-grey`);
+
+  // attributes.forEach((a) => clonedPath.attr(a.name, a.value))
+
+  // clonedPath.attr('')
+}
 
 
 
