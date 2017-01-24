@@ -1,21 +1,21 @@
 const svg = d3.select('#path-group')
 
-const allPaths = svg.selectAll('path')
 
-// allPaths
-//   .on('mouseover', function() {
-//     d3.select(this)
-//       .classed('solid-line', true);
-//   })
-//   .on('mouseout', function() {
-//     d3.select(this)
-//       .classed('solid-line', false);
-//   });
 
-// function animateChart(choice) {
-//   animatePath(choice)
-// }
+// TODO: Implement hover over answer
+// const allPaths = svg.selectAll('path')
 
+function highlightPath(selectedPath) {
+  svg
+    .select(`#${selectedPath}`)
+    .classed('solid-line', true);
+}
+
+function unhighlightPath(selectedPath) {
+  svg
+    .select(`#${selectedPath}`)
+    .classed('solid-line', false);
+}
 
 function animatePath(selectedPath) {
   const duration = 1000;
@@ -134,10 +134,4 @@ function fillInDot(targetNode, delay = 1100) {
     .transition()
     .delay(1100)
     .attr('fill', '#FA2F97')
-    .attr('stroke', '#FA2F97')
-    .attr('stroke-width', 0)
-}
-
-const pathMappings = {
-
 }
