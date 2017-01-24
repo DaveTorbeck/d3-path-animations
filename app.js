@@ -31,7 +31,9 @@
   }
 
   function addAnswerListeners() {
-    [answerOneBtn, answerTwoBtn].forEach((button) => {
+    const answerBtns = [answerOneBtn, answerTwoBtn];
+
+    answerBtns.forEach((button) => {
       const pathName = '#' + button.attr('data-path');
       const path = d3.select(pathName)
       const endNode = d3.select('#' + path.attr('data-end-node'));
@@ -69,17 +71,24 @@
   function addNavListeners(button) {
     button.on('click', () => {
       if (selectedPath !== null) {
+        const notChosenPath = d3.select('#' + answerTwoBtn.attr('data-path'));
+        const animatedPath = selectedPath;
+
+        invalidatePath(notChosenPath);
+
         currentNode = d3.select(`#${selectedPath.attr('data-end-node')}`)
         answerOneBtn.attr('data-path', currentNode.attr('data-path-one'));
         answerTwoBtn.attr('data-path', currentNode.attr('data-path-two'));
 
         addAnswerListeners()
-        selectedPath = null;
+        reset();
+
+        animateAnswerPath(animatedPath, true);
       }
     })
   }
 
-  function animateAnswerPath(path) {
+  function animateAnswerPath(path, expandNode = false) {
     const pathId = path.attr('id');
     const duration = 1000;
     const d = path.attr('d');
@@ -88,11 +97,14 @@
 
     isAnimating = true;
 
+    if (!expandNode)
+      console.log('what')
+      unfillDot(endNode)
+
     // Reset path from hover event
     path
       .classed('dashed-line', true);
 
-    unfillDot(endNode)
 
     svg.insert('path', `#${pathId} + *`)
         .attr('id', `${pathId}-draw-line`)
@@ -106,54 +118,29 @@
           .ease(d3.easeLinear)
           .attr('stroke-dashoffset', 0);
 
-    fillInDot({
-      targetNode: endNode,
-      delay: duration + 10,
-      transition: true,
-      filled: true
-    });
+    if (expandNode) {
+      expandEllipsis(endNode, duration + 10)
+    } else {
+      fillInDot({
+        targetNode: endNode,
+        delay: duration + 10,
+        transition: true,
+        filled: true
+      });
+    }
   }
 
-  function expandEllipsis(targetNode, delay = 1025) {
-    // TODO: Chain exit functions instead of using setTimeout
-    setTimeout(function() {
-      svg.select(`#${targetNode}`)
-      .transition()
-        .duration(200)
-        // .ease(d3.easeLinear)
-        .attr('fill', '#FA2F97')
-        .attr('stroke', '#FA2F97')
-        .attr('stroke-width', 0)
+  function invalidatePath(path) {
+    const endNode = d3.select('#' + path.attr('data-end-node'));
 
-      svg.select(`#${targetNode} ellipse`)
-        .transition()
-          .duration(300)
-          // .ease(d3.easeLinear)
-          .attr('rx', 11.05)
-          .attr('ry', 11.05)
-        .transition()
-          .duration(300)
-          .delay(300)
-          .attr('rx', 6.77)
-          .attr('ry', 6.67)
+    endNode
+      .style('stroke', '#C9C9C9');
 
-      svg.select(`#${targetNode}`)
-        .append('use')
-        .attr('stroke-width', 4)
-        .attr('mask', 'url(#mask-2)')
-        .attr('xlink:href', '#path-1')
-        .attr('stroke', '#FA2F97')
-        .transition()
-          .duration(200)
-          .delay(200)
-          // .ease(d3.easeBounceInOut)
-          .attr('stroke', '#FFFFFF')
-        .transition()
-          // .duration(400)
-          .delay(205)
-          // .ease(d3.easeLinear)
-          .remove()
-    }, delay)
+    path
+      .style('stroke', '#C9C9C9')
+      .style('stroke-dasharray', 0)
+      .style('stroke-width', 1);
+
   }
 
   function fillInDot({targetNode = {}, delay = 0, transition = false, filled = false} = {}) {
@@ -175,6 +162,65 @@
       .style('fill', '#FFFFFF')
       .on('end', () => isAnimating = false)
   }
+
+  function expandEllipsis(targetNode, delay = 0) {
+    // TODO: Chain exit functions instead of using setTimeout
+    const targetId = targetNode.attr('id');
+    setTimeout(function() {
+      targetNode
+        .transition()
+          .duration(200)
+          .ease(d3.easeLinear)
+          .style('fill', '#FA2F97')
+          .style('stroke', '#FA2F97')
+          .attr('stroke-width', 0)
+
+      svg.select(`#${targetId} ellipse`)
+        .transition()
+          .duration(300)
+          // .ease(d3.easeLinear)
+          .attr('rx', 11.05096)
+          .attr('ry', 11.04656)
+          .attr('cx', 11.05096)
+          .attr('cy', 11.04656)
+        // .transition()
+        //   .duration(300)
+        //   .delay(300)
+        //   .attr('rx', 6.77)
+        //   .attr('ry', 6.67)
+
+      targetNode
+        .append('use')
+        .style('stroke-width', 4)
+        .attr('mask', 'url(#mask-2)')
+        .attr('xlink:href', '#path-1')
+        .attr('stroke', '#FA2F97')
+        .transition()
+          .duration(200)
+          .delay(200)
+          // .ease(d3.easeBounceInOut)
+          .attr('stroke', '#FFFFFF')
+    }, delay)
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // This animates with dotted line, allow more abstract class targeting
   // TODO: Might be deprecated
