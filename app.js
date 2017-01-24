@@ -16,30 +16,36 @@ function init() {
 function addListeners(button) {
   const pathName = '#' + button.attr('data-path');
   const path = d3.select(pathName)
-  const endNode = path.attr('data-end-node');
+  const endNode = d3.select('#' + path.attr('data-end-node'));
 
   button.on('click', () =>  animatePath(path));
 
   button
-    .on('mouseenter', () => {
-      if (!isAnimating) {
-        path.classed('highlight-line', true);
+    .on('mouseenter', mouseEnterAnswer)
+    .on('mouseleave', mouseLeaveAnswer);
 
-        fillInDot(endNode, 0);
-      }
-    })
-    .on('mouseleave', () => {
+  function mouseEnterAnswer() {
+    if (!isAnimating) {
+      path.classed('highlight-line', true);
+
+      fillInDot(endNode, 0);
+    }
+  }
+
+  function mouseLeaveAnswer() {
+    const isNodeFull = endNode.attr('data-filled');
+    if (!isNodeFull) {
       path.classed('highlight-line', false);
-
       unfillDot(endNode)
-    });
-
+    }
+  }
 }
 
 function animatePath(path) {
+  const pathId = '#' + path.attr('id');
   const duration = 1000;
   const d = path.attr('d');
-  const endNode = path.attr('data-end-node');
+  const endNode = d3.select('#' + path.attr('data-end-node'));
   const totalLength = path.node().getTotalLength();
 
   isAnimating = true;
@@ -51,9 +57,7 @@ function animatePath(path) {
   // TODO: Can this be done as a css class toggle instead?
   unfillDot(endNode)
 
-  // debugger;
-
-  svg.insert('path', `#${path.attr('id')} + *`)
+  svg.insert('path', `${pathId} + *`)
       .attr('d', d)
       .attr('stroke', '#FA2F97')
       .attr('stroke-width', 2)
@@ -64,10 +68,71 @@ function animatePath(path) {
         .ease(d3.easeLinear)
         .attr('stroke-dashoffset', 0);
 
-  fillInDot(endNode, duration + 10);
+  fillInDot(endNode, duration + 10, true);
+}
+
+function expandEllipsis(targetNode, delay = 1025) {
+  // TODO: Chain exit functions instead of using setTimeout
+  setTimeout(function() {
+    svg.select(`#${targetNode}`)
+    .transition()
+      .duration(200)
+      // .ease(d3.easeLinear)
+      .attr('fill', '#FA2F97')
+      .attr('stroke', '#FA2F97')
+      .attr('stroke-width', 0)
+
+    svg.select(`#${targetNode} ellipse`)
+      .transition()
+        .duration(300)
+        // .ease(d3.easeLinear)
+        .attr('rx', 11.05)
+        .attr('ry', 11.05)
+      .transition()
+        .duration(300)
+        .delay(300)
+        .attr('rx', 6.77)
+        .attr('ry', 6.67)
+
+    svg.select(`#${targetNode}`)
+      .append('use')
+      .attr('stroke-width', 4)
+      .attr('mask', 'url(#mask-2)')
+      .attr('xlink:href', '#path-1')
+      .attr('stroke', '#FA2F97')
+      .transition()
+        .duration(200)
+        .delay(200)
+        // .ease(d3.easeBounceInOut)
+        .attr('stroke', '#FFFFFF')
+      .transition()
+        // .duration(400)
+        .delay(205)
+        // .ease(d3.easeLinear)
+        .remove()
+  }, delay)
+}
+
+// TODO: Make it so transition is based on parameter
+// Maybe pass an object instead of multiple params
+function fillInDot(targetNode, delay = 0, filled = false) {
+  targetNode
+    .transition()
+    .delay(delay)
+    .attr('fill', '#FA2F97')
+    .attr('data-filled', filled)
+    .on('end', () => isAnimating = false)
+}
+
+// TODO: Maybe combine this as a toggle function with fillInDot
+function unfillDot(targetNode) {
+  targetNode
+    .attr('fill', '#FFFFFF')
+    .on('end', () => isAnimating = false)
 }
 
 // This animates with dotted line, allow more abstract class targeting
+// TODO: Might be deprecated
 function animateSevenPath() {
   const path = svg.select('#path-group-seven');
   const d = path.attr('d');
@@ -114,64 +179,4 @@ function animateSevenPath() {
       .attr('stroke-dashoffset', 0);
 
   fillInDot(endNode);
-}
-
-function expandEllipsis(targetNode, delay = 1025) {
-  setTimeout(function() {
-    svg.select(`#${targetNode}`)
-    .transition()
-      .duration(200)
-      // .ease(d3.easeLinear)
-      .attr('fill', '#FA2F97')
-      .attr('stroke', '#FA2F97')
-      .attr('stroke-width', 0)
-
-    svg.select(`#${targetNode} ellipse`)
-      .transition()
-        .duration(300)
-        // .ease(d3.easeLinear)
-        .attr('rx', 11.05)
-        .attr('ry', 11.05)
-      .transition()
-        .duration(300)
-        .delay(300)
-        .attr('rx', 6.77)
-        .attr('ry', 6.67)
-
-    svg.select(`#${targetNode}`)
-      .append('use')
-      .attr('stroke-width', 4)
-      .attr('mask', 'url(#mask-2)')
-      .attr('xlink:href', '#path-1')
-      .attr('stroke', '#FA2F97')
-      .transition()
-        .duration(200)
-        .delay(200)
-        // .ease(d3.easeBounceInOut)
-        .attr('stroke', '#FFFFFF')
-      .transition()
-        // .duration(400)
-        .delay(205)
-        // .ease(d3.easeLinear)
-        .remove()
-  }, delay)
-}
-
-// TODO: Make it so transition is based on parameter
-function fillInDot(targetNode, delay = 0) {
-  d3.select(`#${targetNode}`)
-    .transition()
-    .delay(delay)
-    .attr('fill', '#FA2F97')
-    .on('end', function() {
-      isAnimating = false;
-    });
-}
-
-function unfillDot(targetNode, delay = 0) {
-  d3.select(`#${targetNode}`)
-    .attr('fill', '#FFFFFF')
-    .on('end', function() {
-      isAnimating = false;
-    });
 }
