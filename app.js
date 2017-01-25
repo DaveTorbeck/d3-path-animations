@@ -154,15 +154,7 @@
   function animateBlackDotted(path) {
     const clonedPath = clonePathAndInsert(path);
     const totalLength = path.node().getTotalLength();
-    const dashing = '3, 3';
-    const dashLength = dashing
-                      .split(/[\s,]/)
-                      .map((a) => parseFloat(a) || 0 )
-                      .reduce((a, b) => a + b );
-
-    const dashCount = Math.ceil( totalLength / dashLength );
-    const newDashes = new Array(dashCount).join( dashing + " " );
-    const dashArray = newDashes + " 0, " + totalLength;
+    const dashArray = createDashArray('3, 3', totalLength);
 
     path
       .attr('stroke', '#000000')
@@ -252,6 +244,18 @@ function clonePathAndInsert(path) {
   return clonedPath;
 }
 
+function createDashArray(dashing, length) {
+  const dashLength = dashing
+                      .split(/[\s,]/)
+                      .map((a) => parseFloat(a) || 0 )
+                      .reduce((a, b) => a + b );
+
+  const dashCount = Math.ceil(length / dashLength);
+  const newDashes = new Array(dashCount).join( dashing + ' ');
+  const dashArray = `${newDashes} 0, ${length}`;
+
+  return dashArray;
+}
 
 
 
@@ -288,16 +292,7 @@ function clonePathAndInsert(path) {
       .attr('stroke-width', 2)
 
     const totalLength = path.node().getTotalLength();
-
-    const dashing = '3, 3';
-    const dashLength = dashing
-                      .split(/[\s,]/)
-                      .map((a) => parseFloat(a) || 0 )
-                      .reduce((a, b) => a + b );
-
-    const dashCount = Math.ceil( totalLength / dashLength );
-    const newDashes = new Array(dashCount).join( dashing + " " );
-    const dashArray = newDashes + " 0, " + totalLength;
+    const dashArray = createDashArray('3, 3', totalLength);
 
     d3.select('path#path-group-insert-two')
       .attr('stroke-dashoffset', totalLength)
