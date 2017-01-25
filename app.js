@@ -78,6 +78,13 @@
         invalidatePath(notChosenPath);
 
         currentNode = d3.select(`#${selectedPath.attr('data-end-node')}`)
+
+        const nextPathOne = d3.select(`#${currentNode.attr('data-path-one')}`);
+        const nextPathTwo = d3.select(`#${currentNode.attr('data-path-two')}`);
+
+        animateBlackDotted(nextPathOne);
+        animateBlackDotted(nextPathTwo);
+
         answerOneBtn.attr('data-path', currentNode.attr('data-path-one'));
         answerTwoBtn.attr('data-path', currentNode.attr('data-path-two'));
 
@@ -106,7 +113,6 @@
     path
       .classed('dashed-line', true);
 
-
     svg.insert('path', `#${pathId} + *`)
         .attr('id', `${pathId}-draw-line`)
         .attr('d', d)
@@ -122,7 +128,7 @@
     if (expandNode) {
       expandEllipsis(endNode, duration + 10)
     } else {
-      const payLoad = {
+      const payload = {
         targetNode: endNode,
         delay: duration + 10,
         transition: true,
@@ -145,9 +151,29 @@
       .style('stroke-width', 1);
   }
 
-  function animateBlackDotted() {
-    const path = svg.select('#path-nine');
-    let newPath = path.attr('')
+  function animateBlackDotted(path) {
+    const clonedPath = clonePathAndInsert(path);
+    const totalLength = path.node().getTotalLength();
+    const dashing = '3, 3';
+    const dashLength = dashing
+                      .split(/[\s,]/)
+                      .map((a) => parseFloat(a) || 0 )
+                      .reduce((a, b) => a + b );
+
+    const dashCount = Math.ceil( totalLength / dashLength );
+    const newDashes = new Array(dashCount).join( dashing + " " );
+    const dashArray = newDashes + " 0, " + totalLength;
+
+    path
+      .attr('stroke', '#000000')
+      .attr('stroke-width', 2)
+      .attr('stroke-dashoffset', totalLength)
+      .attr('stroke-dasharray', dashArray)
+      .transition()
+        .duration(1000)
+        .ease(d3.easeLinear)
+        .attr('stroke-dashoffset', 0)
+      .on('end', () => clonedPath.remove());
   }
 
   function fillInDot({targetNode = {}, delay = 0, transition = false, filled = false} = {}) {
@@ -214,15 +240,16 @@
 
 
 function clonePathAndInsert(path) {
+  const d = path.attr('d');
+  const stroke = path.attr('stroke');
+  const strokeWidth = path.attr('stroke-width');
+  const clonedPath = svg.insert('path', `#${path.attr('id')}`)
+                        .attr('id', `${path.attr('id')}-draw-line-grey`)
+                        .attr('d', d)
+                        .attr('stroke', stroke)
+                        .attr('stroke-width', strokeWidth);
 
-  // const attributes= path.node().attributes;
-
-  // const clonedPath = svg.insert('path', `#${path.attr('id')} + *`)
-  //                       .attr('id', `${path.attr('id')}-draw-line-grey`);
-
-  // attributes.forEach((a) => clonedPath.attr(a.name, a.value))
-
-  // clonedPath.attr('')
+  return clonedPath;
 }
 
 
