@@ -14,50 +14,48 @@
 
   function init() {
     addAnswerListeners();
-
-    // addNavListeners(prevBtn);
-    addNavListeners(nextBtn);
+    addNavListeners();
   }
 
   function reset() {
-    if (selectedPath !== null) {
-      const drawnPath = d3.select('#' + selectedPath.attr('id') + '-draw-line');
-      const endNode = d3.select('#' + selectedPath.attr('data-end-node'));
+    if (selectedPath === null) return;
 
-      drawnPath.remove();
-      unfillDot(endNode);
-      selectedPath = null;
-    }
+    const drawnPath = d3.select('#' + selectedPath.attr('id') + '-draw-line');
+    const endNode = d3.select('#' + selectedPath.attr('data-end-node'));
+
+    drawnPath.remove();
+    unfillDot(endNode);
+    selectedPath = null;
   }
 
   function addAnswerListeners() {
     const answerBtns = [answerOneBtn, answerTwoBtn];
 
-    answerBtns.forEach((button) => {
+    answerBtns.forEach(function(button) {
       const pathName = '#' + button.attr('data-path');
       const path = d3.select(pathName)
       const endNode = d3.select('#' + path.attr('data-end-node'));
 
       button
-        .on('click', onClick)
-        .on('mouseenter', mouseEnterAnswer)
-        .on('mouseout', mouseOutAnswer);
+        .on('click', () =>  onClick(path))
+        .on('mouseenter', () => mouseEnterAnswer(path, endNode))
+        .on('mouseout', () => mouseOutAnswer(path, endNode));
     });
 
-    function onClick() {
+    function onClick(path) {
       reset();
       selectedPath = path;
       animateAnswerPath(path)
     }
 
-    function mouseEnterAnswer() {
-      if (!isAnimating) {
-        path.classed('highlight-line', true);
-        fillInDot({targetNode: endNode});
-      }
+    function mouseEnterAnswer(path, endNode) {
+      if (isAnimating) return;
+
+      path.classed('highlight-line', true);
+      fillInDot({targetNode: endNode});
     }
 
-    function mouseOutAnswer() {
+    function mouseOutAnswer(path, endNode) {
       const isNodeFull = endNode.attr('data-filled') === 'true' ? true : false;
 
       if (!isNodeFull) {
@@ -67,9 +65,10 @@
     }
   }
 
-  // TODO: Implement
-  function addNavListeners(button) {
-    button.on('click', onClick);
+  // TODO: Implement prev
+  function addNavListeners() {
+
+    nextBtn.on('click', onClick);
 
     function onClick() {
       if (selectedPath !== null) {
@@ -95,13 +94,12 @@
     const pathId = path.attr('id');
     const duration = 1000;
     const d = path.attr('d');
-    const endNode = d3.select('#' + path.attr('data-end-node')); 
-    const totalLength = path.node().getTotalLength(); 
+    const endNode = d3.select('#' + path.attr('data-end-node'));
+    const totalLength = path.node().getTotalLength();
 
     isAnimating = true;
 
     if (!expandNode)
-      console.log('what')
       unfillDot(endNode)
 
     // Reset path from hover event
@@ -124,12 +122,14 @@
     if (expandNode) {
       expandEllipsis(endNode, duration + 10)
     } else {
-      fillInDot({
+      const payLoad = {
         targetNode: endNode,
         delay: duration + 10,
         transition: true,
         filled: true
-      });
+      };
+
+      fillInDot(payload);
     }
   }
 
@@ -147,11 +147,7 @@
 
   function animateBlackDotted() {
     const path = svg.select('#path-nine');
-    
     let newPath = path.attr('')
-
-
-      
   }
 
   function fillInDot({targetNode = {}, delay = 0, transition = false, filled = false} = {}) {
@@ -171,6 +167,7 @@
   function unfillDot(targetNode) {
     targetNode
       .style('fill', '#FFFFFF')
+      .attr('data-filled', false)
       .on('end', () => isAnimating = false)
   }
 
