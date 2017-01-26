@@ -161,12 +161,21 @@
     const endNode = d3.select('#' + path.attr('data-end-node'));
 
     endNode
-      .style('stroke', GREY);
+      .attr('stroke', GREY);
+
+
 
     path
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', 0)
       .attr('stroke', GREY);
+
+    path
+      .classed('dashed-line-black', false);
+
+    // if (path.attr('id') === 'path-three') {
+    //   debugger;
+    // }
   }
 
   function resetAnswerPath(path) {
@@ -181,15 +190,13 @@
 
 
     endNode
-      .style('stroke', BLACK)
-      .style('fill', WHITE)
-      .style('stroke-width', 2)
+      .attr('stroke', BLACK)
+      .attr('fill', WHITE)
+      .attr('stroke-width', 2)
 
     endNode
       .select('ellipse')
-      .style('stroke-width', 2)
-
-    console.log(endNode.selectAll('ellipse').node())
+      .attr('stroke-width', 2)
 
     path
       .classed('dashed-line-black', true)
@@ -201,18 +208,18 @@
       targetNode
         .transition()
         .delay(delay)
-        .style('fill', MAGENTA)
+        .attr('fill', MAGENTA)
         .attr('data-filled', filled)
         .on('end', () => isAnimating = false)
     } else {
       targetNode
-        .style('fill', MAGENTA)
+        .attr('fill', MAGENTA)
     }
   }
 
   function unfillDot(targetNode) {
     targetNode
-      .style('fill', WHITE)
+      .attr('fill', WHITE)
       .attr('data-filled', false)
       .on('end', () => isAnimating = false)
   }
@@ -228,7 +235,7 @@
   function changeToPastNode(targetNode) {
     targetNode
       .attr('stroke', MAGENTA)
-      .style('fill', MAGENTA)
+      .attr('fill', MAGENTA)
       .select('ellipse')
         .attr('rx', 6.6305)
         .attr('ry', 6.6279);
@@ -246,8 +253,8 @@
         .transition()
           .duration(200)
           .ease(d3.easeLinear)
-          .style('fill', MAGENTA)
-          .style('stroke', MAGENTA)
+          .attr('fill', MAGENTA)
+          .attr('stroke', MAGENTA)
           .attr('stroke-width', 0)
 
       targetNode
@@ -268,7 +275,7 @@
 
       targetNode
         .append('use')
-        .style('stroke-width', 4)
+        .attr('stroke-width', 4)
         .attr('mask', 'url(#mask-2)')
         .attr('xlink:href', '#path-1')
         .attr('stroke', MAGENTA)
@@ -296,7 +303,10 @@
       changeToPastNode(prevNode);
 
       currentStepObj.currentNode = d3.select(`#${selectedPath.attr('data-end-node')}`)
-      invalidatePath(notSelectedPath);
+
+
+      if (notSelectedPath !== null)
+        invalidatePath(notSelectedPath);
 
       const nextPathOne = d3.select(`#${currentStepObj.currentNode.attr('data-path-one')}`);
       const nextPathTwo = d3.select(`#${currentStepObj.currentNode.attr('data-path-two')}`);
@@ -318,6 +328,7 @@
   }
 
   function onPrevClick() {
+    // debugger;
     if (stepCount === 0) return;
 
     const currentNode = journeyMap[stepCount].currentNode;
@@ -329,6 +340,7 @@
     const prevPathOne = d3.select(`#${prevNode.attr('data-path-one')}`);
     const prevPathTwo = d3.select(`#${prevNode.attr('data-path-two')}`);
 
+    invalidatePath(selectedPath);
     invalidatePath(pathOne)
     invalidatePath(pathTwo)
     changeToPastNode(currentNode);
@@ -346,11 +358,21 @@
     resetAnswerPath(prevPathOne);
     resetAnswerPath(prevPathTwo);
 
-    selectedPath = null;
-    notSelectedPath = null;
+
+    removeSelectedPath();
 
   }
 
+  function removeSelectedPath() {
+    const endNode = d3.select(`#${selectedPath.attr('data-end-node')}`);
+
+    d3.select(`#${selectedPath.attr('id')}-draw-line`).remove()
+    endNode.attr('fill', WHITE)
+    selectedPath.classed('highlight-line', false);
+
+    selectedPath = null;
+    notSelectedPath = null;
+  }
 
   function clonePathAndInsert(path) {
     const d = path.attr('d');
