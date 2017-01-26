@@ -43,7 +43,6 @@
         return;
       }
 
-
       const pathName = '#' + button.attr('data-path');
       const path = d3.select(pathName)
       const endNode = d3.select('#' + path.attr('data-end-node'));
@@ -287,164 +286,113 @@
   }
 
 
-function clonePathAndInsert(path) {
-  const d = path.attr('d');
-  const stroke = path.attr('stroke');
-  const strokeWidth = path.attr('stroke-width');
-  const clonedPath = svg.insert('path', `#${path.attr('id')}`)
-                        .attr('id', `${path.attr('id')}-draw-line-grey`)
-                        .attr('d', d)
-                        .attr('stroke', stroke)
-                        .attr('stroke-width', strokeWidth);
+  function clonePathAndInsert(path) {
+    const d = path.attr('d');
+    const stroke = path.attr('stroke');
+    const strokeWidth = path.attr('stroke-width');
+    const clonedPath = svg.insert('path', `#${path.attr('id')}`)
+                          .attr('id', `${path.attr('id')}-draw-line-grey`)
+                          .attr('d', d)
+                          .attr('stroke', stroke)
+                          .attr('stroke-width', strokeWidth);
 
-  return clonedPath;
-}
-
-function createDashArray(dashing, length) {
-  const dashLength = dashing
-                      .split(/[\s,]/)
-                      .map((a) => parseFloat(a) || 0 )
-                      .reduce((a, b) => a + b );
-
-  const dashCount = Math.ceil(length / dashLength);
-  const newDashes = new Array(dashCount).join( dashing + ' ');
-  const dashArray = `${newDashes} 0, ${length}`;
-
-  return dashArray;
-}
-
-function removeClickHandlers(button) {
-  button
-    .on('click', null)
-    .on('mouseenter', null)
-    .on('mouseout', null);
-}
-
-
-
-
-var roadMap = {
-  'chart-dot-one': {
-    'id': '#chart-dot-one',
-    'paths': [
-      {
-        'name': 'path-six',
-        'id': '#path-six',
-        'endNode': 'chart-dot-four'
-      }
-    ]
-  },
-  'chart-dot-two': {
-    'id': '#chart-dot-two',
-    'paths': [
-      {
-        'name': 'path-one',
-        'id': '#path-one',
-        'endNode': 'chart-dot-eight'
-      },
-      {
-        'name': 'path-two',
-        'id': '#path-two',
-        'endNode': 'chart-dot-nine'
-      }
-    ]
-  },
-  'chart-dot-three': {
-    'id': '#chart-dot-three',
-    'paths': [
-      {
-        'name': 'path-three',
-        'id': '#path-three',
-        'endNode': 'chart-dot-five'
-      },
-      {
-        'name': 'path-four',
-        'id': '#path-four',
-        'endNode': 'chart-dot-four'
-      }
-    ]
-  },
-  'chart-dot-seven': {
-    'id': '#chart-dot-eight',
-    'paths': null
-  },
-  'chart-dot-eight': {
-    'id': '#chart-dot-eight',
-    'paths': [
-      {
-        'name': 'path-five',
-        'id': '#path-five',
-        'endNode': 'chart-dot-one'
-      },
-      {
-        'name': 'path-seven',
-        'id': '#path-seven',
-        'endNode': 'chart-dot-six'
-      }
-    ]
-  },
-  'chart-dot-nine': {
-    'id': '#chart-dot-nine',
-    'paths': []
+    return clonedPath;
   }
-}
 
+  function createDashArray(dashing, length) {
+    const dashLength = dashing
+                        .split(/[\s,]/)
+                        .map((a) => parseFloat(a) || 0 )
+                        .reduce((a, b) => a + b);
 
+    const dashCount = Math.ceil(length / dashLength);
+    const newDashes = new Array(dashCount).join(dashing + ' ');
+    const dashArray = `${newDashes} 0, ${length}`;
 
+    return dashArray;
+  }
 
+  function removeClickHandlers(button) {
+    button
+      .on('click', null)
+      .on('mouseenter', null)
+      .on('mouseout', null);
+  }
 
-
-
-
-
-
-
-  // This animates with dotted line, allow more abstract class targeting
-  // TODO: Might be deprecated
-//   function animateSevenPath() {
-//     const path = svg.select('#path-group-seven');
-//     const d = path.attr('d');
-//     const endNode = path.attr('data-end-node');
-
-//     const pathWhite = svg.insert('path', 'path#path-group-eight')
-//       .attr('id', 'path-group-insert-white')
-//       .attr('d', d)
-//       .attr('stroke', '#FFFFFF')
-//       .attr('stroke-width', 2)
-
-//     const pathDotted = svg.insert('path', 'path#path-group-eight')
-//       .attr('id', 'path-group-insert-two')
-//       .attr('d', d)
-//       .attr('stroke', '#FA2F97')
-//       .attr('stroke-width', 2)
-
-//     const totalLength = path.node().getTotalLength();
-//     const dashArray = createDashArray('3, 3', totalLength);
-
-//     d3.select('path#path-group-insert-two')
-//       .attr('stroke-dashoffset', totalLength)
-//       .attr('stroke-dasharray', dashArray)
-//       .transition()
-//         .duration(1000)
-//         .ease(d3.easeLinear)
-//         .attr('stroke-dashoffset', 0);
-
-//     d3.select('#path-group-insert-white')
-//       .attr('stroke-dasharray', totalLength + ' ' + totalLength)
-//       .attr('stroke-dashoffset', totalLength)
-//       .transition()
-//         .duration(1200)
-//         .ease(d3.easeLinear)
-//         .attr('stroke-dashoffset', 0);
-
-//     fillInDot({targetNode: endNode});
-//   }
-
-
-
-
-
-
-
-
+  var roadMap = {
+    'chart-dot-one': {
+      'id': '#chart-dot-one',
+      'paths': [
+        {
+          'name': 'path-six',
+          'id': '#path-six',
+          'endNode': 'chart-dot-four'
+        }
+      ]
+    },
+    'chart-dot-two': {
+      'id': '#chart-dot-two',
+      'paths': [
+        {
+          'name': 'path-one',
+          'id': '#path-one',
+          'endNode': 'chart-dot-eight'
+        },
+        {
+          'name': 'path-two',
+          'id': '#path-two',
+          'endNode': 'chart-dot-nine'
+        }
+      ]
+    },
+    'chart-dot-three': {
+      'id': '#chart-dot-three',
+      'paths': [
+        {
+          'name': 'path-three',
+          'id': '#path-three',
+          'endNode': 'chart-dot-five'
+        },
+        {
+          'name': 'path-four',
+          'id': '#path-four',
+          'endNode': 'chart-dot-four'
+        }
+      ]
+    },
+    'chart-dot-seven': {
+      'id': '#chart-dot-eight',
+      'paths': null
+    },
+    'chart-dot-eight': {
+      'id': '#chart-dot-eight',
+      'paths': [
+        {
+          'name': 'path-five',
+          'id': '#path-five',
+          'endNode': 'chart-dot-one'
+        },
+        {
+          'name': 'path-seven',
+          'id': '#path-seven',
+          'endNode': 'chart-dot-six'
+        }
+      ]
+    },
+    'chart-dot-nine': {
+      'id': '#chart-dot-nine',
+      'paths': [
+        {
+          'name': 'path-eight',
+          'id': '#path-eight',
+          'endNode': 'chart-dot-seven'
+        },
+        {
+          'name': 'path-nine',
+          'id': 'path-nine',
+          'endNode': 'chart-dot-nine'
+        }
+      ]
+    }
+  }
 }
