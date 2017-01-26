@@ -29,7 +29,8 @@
     const endNode = d3.select('#' + selectedPath.attr('data-end-node'));
 
     if (removePath) {
-      drawnPath.remove();
+      drawnPath.
+        classed('hide', true);
     }
 
     unfillDot(endNode);
@@ -77,7 +78,7 @@
       if (isAnimating || path === selectedPath) return;
 
       path.classed('highlight-line', true);
-      path.classed('dashed-line', false);
+      path.classed('dashed-line-black', false);
       fillInDot({targetNode: endNode});
     }
 
@@ -86,7 +87,7 @@
 
       if (!isNodeFull) {
         path.classed('highlight-line', false);
-        path.classed('dashed-line', true);
+        path.classed('dashed-line-black', true);
         unfillDot(endNode)
       }
     }
@@ -110,7 +111,7 @@
 
     // Reset path from hover event
     path
-      .classed('dashed-line', true);
+      .classed('dashed-line-black', true);
 
     svg.insert('path', `#${pathId} + *`)
         .attr('id', `${pathId}-draw-line`)
@@ -163,9 +164,36 @@
       .style('stroke', GREY);
 
     path
-      .style('stroke', GREY)
-      .style('stroke-dasharray', 0)
-      .style('stroke-width', 1);
+      .attr('stroke-width', 1)
+      .attr('stroke-dasharray', 0)
+      .attr('stroke', GREY);
+  }
+
+  function resetAnswerPath(path) {
+    const endNode = d3.select('#' + path.attr('data-end-node'));
+    const totalLength = path.node().getTotalLength();
+    const drawnPath = d3.select(`#${path.attr('id')}-draw-line`);
+    const dashArray = createDashArray('3, 3', totalLength)
+
+    drawnPath
+      .classed('hide', true);
+
+
+
+    endNode
+      .style('stroke', BLACK)
+      .style('fill', WHITE)
+      .style('stroke-width', 2)
+
+    endNode
+      .select('ellipse')
+      .style('stroke-width', 2)
+
+    console.log(endNode.selectAll('ellipse').node())
+
+    path
+      .classed('dashed-line-black', true)
+      .classed('invalid-line', false);
   }
 
   function fillInDot({targetNode = {}, delay = 0, transition = false, filled = false} = {}) {
@@ -206,7 +234,7 @@
         .attr('ry', 6.6279);
 
     targetNode
-      .select('use')
+      .selectAll('use')
       .style('display', 'none');
 
   }
@@ -231,6 +259,7 @@
           .attr('ry', 11.04656)
           .attr('cx', 11.05096)
           .attr('cy', 11.04656)
+          .attr('stroke-width', 1)
         // .transition()
         //   .duration(300)
         //   .delay(300)
@@ -272,7 +301,9 @@
       const nextPathOne = d3.select(`#${currentStepObj.currentNode.attr('data-path-one')}`);
       const nextPathTwo = d3.select(`#${currentStepObj.currentNode.attr('data-path-two')}`);
 
-      resetAnswerButtons(currentNode);
+      resetAnswerButtons(currentStepObj.currentNode);
+
+      currentStepObj.prevPath = selectedPath;
 
       reset();
 
@@ -295,6 +326,9 @@
     const pathOne = d3.select(`#${currentNode.attr('data-path-one')}`)
     const pathTwo = d3.select(`#${currentNode.attr('data-path-two')}`)
 
+    const prevPathOne = d3.select(`#${prevNode.attr('data-path-one')}`);
+    const prevPathTwo = d3.select(`#${prevNode.attr('data-path-two')}`);
+
     invalidatePath(pathOne)
     invalidatePath(pathTwo)
     changeToPastNode(currentNode);
@@ -305,7 +339,15 @@
 
     expandEllipsis(prevNode)
 
-    resetAnswerButtons();
+    resetAnswerButtons(prevNode);
+
+
+    // TODO: Move into separate function and use node as parameter
+    resetAnswerPath(prevPathOne);
+    resetAnswerPath(prevPathTwo);
+
+    selectedPath = null;
+    notSelectedPath = null;
 
   }
 
@@ -358,15 +400,18 @@
     },
     {
       'currentNode': null,
-      'prevNode': null
+      'prevNode': null,
+      'prevPath': null
     },
     {
       'currentNode': null,
-      'prevNode': null
+      'prevNode': null,
+      'prevPath': null
     },
     {
       'currentNode': null,
-      'prevNode': null
+      'prevNode': null,
+      'prevPath': null
     }
   ];
 

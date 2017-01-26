@@ -15,8 +15,22 @@
   stroke: #333333;
 }
 
+.invalid-line {
+  stroke-width: 1;
+  stroke-dasharray: 0;
+  stroke: #C9C9C9;
+}
+
 .filled-dot {
   stroke: #FA2F97;
+}
+
+.current-dot {
+
+}
+
+.hide {
+  display: none;
 }
 
 
@@ -31,7 +45,7 @@
 
 .buttons-container > button {
   display: flex;
-  flex-basis: calc(50% - 40px);  
+  flex-basis: calc(50% - 40px);
   justify-content: center;
   flex-direction: column;
   margin: 50px 0 50px 0;
