@@ -5,9 +5,14 @@
   const prevBtn = d3.select('.previous');
   const nextBtn = d3.select('.next');
 
-  let selectedPath = null;
-  let currentNode = null;
+  const MAGENTA = '#FA2F97';
+  const BLACK = '#000';
+  const WHITE = '#FFF';
+  const GREY = '#C9C9C9';
 
+  let currentNode = d3.select('#chart-dot-two');
+  let selectedPath = null;
+  let notSelectedPath = null;
   let isAnimating = false;
 
   init();
@@ -26,15 +31,23 @@
     drawnPath.remove();
     unfillDot(endNode);
     selectedPath = null;
+    notSelectedPath = null;
   }
 
   function addAnswerListeners() {
     const answerBtns = [answerOneBtn, answerTwoBtn];
 
-    answerBtns.forEach(function(button) {
+    answerBtns.forEach((button) => {
+      if (button.attr('data-path') === null) {
+        removeClickHandlers(button);
+        return;
+      }
+
+
       const pathName = '#' + button.attr('data-path');
       const path = d3.select(pathName)
       const endNode = d3.select('#' + path.attr('data-end-node'));
+
 
       button
         .on('click', () =>  onClick(path))
@@ -43,8 +56,18 @@
     });
 
     function onClick(path) {
+      const currentNodeId = currentNode.attr('id');
+      const possiblePaths = roadMap[currentNodeId].paths
+
       reset();
+
       selectedPath = path;
+
+      notSelectedPathId =
+        _.find(possiblePaths, (p) => p.name !== selectedPath.attr('id')).id;
+
+      notSelectedPath = d3.select(notSelectedPathId);
+
       animateAnswerPath(path)
     }
 
@@ -72,18 +95,17 @@
 
     function onClick() {
       if (selectedPath !== null) {
-        const notChosenPath = d3.select('#' + answerTwoBtn.attr('data-path'));
         const animatedPath = selectedPath;
+        console.log('NOT SELECTED PATH: ')
+        console.log(notSelectedPath.node());
 
-        invalidatePath(notChosenPath);
+        invalidatePath(notSelectedPath);
+        changeToPastNode(currentNode);
 
         currentNode = d3.select(`#${selectedPath.attr('data-end-node')}`)
 
         const nextPathOne = d3.select(`#${currentNode.attr('data-path-one')}`);
         const nextPathTwo = d3.select(`#${currentNode.attr('data-path-two')}`);
-
-        animateBlackDotted(nextPathOne);
-        animateBlackDotted(nextPathTwo);
 
         answerOneBtn.attr('data-path', currentNode.attr('data-path-one'));
         answerTwoBtn.attr('data-path', currentNode.attr('data-path-two'));
@@ -92,7 +114,14 @@
 
         reset();
 
+
         animateAnswerPath(animatedPath, true);
+
+        if (nextPathOne.node() !== null)
+          animateBlackPath(nextPathOne, 1010);
+
+        if (nextPathTwo.node() !== null)
+          animateBlackPath(nextPathTwo, 1010);
       }
     }
   }
@@ -116,7 +145,7 @@
     svg.insert('path', `#${pathId} + *`)
         .attr('id', `${pathId}-draw-line`)
         .attr('d', d)
-        .attr('stroke', '#FA2F97')
+        .attr('stroke', MAGENTA)
         .attr('stroke-width', 2)
         .attr('stroke-dasharray', totalLength + ' ' + totalLength)
         .attr('stroke-dashoffset', totalLength)
@@ -139,33 +168,38 @@
     }
   }
 
-  function invalidatePath(path) {
-    const endNode = d3.select('#' + path.attr('data-end-node'));
-
-    endNode
-      .style('stroke', '#C9C9C9');
-
-    path
-      .style('stroke', '#C9C9C9')
-      .style('stroke-dasharray', 0)
-      .style('stroke-width', 1);
-  }
-
-  function animateBlackDotted(path) {
+  function animateBlackPath(path, delay = 0) {
     const clonedPath = clonePathAndInsert(path);
     const totalLength = path.node().getTotalLength();
     const dashArray = createDashArray('3, 3', totalLength);
+    const endNode = d3.select(`#${path.attr('data-end-node')}`);
 
     path
-      .attr('stroke', '#000000')
+      .attr('stroke', BLACK)
       .attr('stroke-width', 2)
       .attr('stroke-dashoffset', totalLength)
       .attr('stroke-dasharray', dashArray)
       .transition()
         .duration(1000)
+        .delay(delay)
         .ease(d3.easeLinear)
         .attr('stroke-dashoffset', 0)
-      .on('end', () => clonedPath.remove());
+      .on('end', () => {
+        clonedPath.remove();
+        createBlackNode(endNode);
+      });
+  }
+
+  function invalidatePath(path) {
+    const endNode = d3.select('#' + path.attr('data-end-node'));
+
+    endNode
+      .style('stroke', GREY);
+
+    path
+      .style('stroke', GREY)
+      .style('stroke-dasharray', 0)
+      .style('stroke-width', 1);
   }
 
   function fillInDot({targetNode = {}, delay = 0, transition = false, filled = false} = {}) {
@@ -173,35 +207,57 @@
       targetNode
         .transition()
         .delay(delay)
-        .style('fill', '#FA2F97')
+        .style('fill', MAGENTA)
         .attr('data-filled', filled)
         .on('end', () => isAnimating = false)
     } else {
       targetNode
-        .style('fill', '#FA2F97')
+        .style('fill', MAGENTA)
     }
   }
 
   function unfillDot(targetNode) {
     targetNode
-      .style('fill', '#FFFFFF')
+      .style('fill', WHITE)
       .attr('data-filled', false)
       .on('end', () => isAnimating = false)
   }
 
+  function createBlackNode(targetNode) {
+    targetNode
+      .transition()
+        .duration(300)
+        .ease(d3.easeLinear)
+        .attr('stroke', BLACK);
+  }
+
+  function changeToPastNode(targetNode) {
+    targetNode
+      .attr('stroke', MAGENTA)
+      .style('fill', MAGENTA)
+      .select('ellipse')
+        .attr('rx', 6.6305)
+        .attr('ry', 6.6279);
+
+    targetNode
+      .select('use')
+      .style('display', 'none');
+
+  }
+
   function expandEllipsis(targetNode, delay = 0) {
     // TODO: Chain exit functions instead of using setTimeout
-    const targetId = targetNode.attr('id');
     setTimeout(function() {
       targetNode
         .transition()
           .duration(200)
           .ease(d3.easeLinear)
-          .style('fill', '#FA2F97')
-          .style('stroke', '#FA2F97')
+          .style('fill', MAGENTA)
+          .style('stroke', MAGENTA)
           .attr('stroke-width', 0)
 
-      svg.select(`#${targetId} ellipse`)
+      targetNode
+        .select('ellipse')
         .transition()
           .duration(300)
           // .ease(d3.easeLinear)
@@ -220,12 +276,12 @@
         .style('stroke-width', 4)
         .attr('mask', 'url(#mask-2)')
         .attr('xlink:href', '#path-1')
-        .attr('stroke', '#FA2F97')
+        .attr('stroke', MAGENTA)
         .transition()
           .duration(200)
           .delay(200)
           // .ease(d3.easeBounceInOut)
-          .attr('stroke', '#FFFFFF')
+          .attr('stroke', WHITE)
         .on('end', () => isAnimating = false)
     }, delay)
   }
@@ -257,10 +313,81 @@ function createDashArray(dashing, length) {
   return dashArray;
 }
 
+function removeClickHandlers(button) {
+  button
+    .on('click', null)
+    .on('mouseenter', null)
+    .on('mouseout', null);
+}
 
 
 
 
+var roadMap = {
+  'chart-dot-one': {
+    'id': '#chart-dot-one',
+    'paths': [
+      {
+        'name': 'path-six',
+        'id': '#path-six',
+        'endNode': 'chart-dot-four'
+      }
+    ]
+  },
+  'chart-dot-two': {
+    'id': '#chart-dot-two',
+    'paths': [
+      {
+        'name': 'path-one',
+        'id': '#path-one',
+        'endNode': 'chart-dot-eight'
+      },
+      {
+        'name': 'path-two',
+        'id': '#path-two',
+        'endNode': 'chart-dot-nine'
+      }
+    ]
+  },
+  'chart-dot-three': {
+    'id': '#chart-dot-three',
+    'paths': [
+      {
+        'name': 'path-three',
+        'id': '#path-three',
+        'endNode': 'chart-dot-five'
+      },
+      {
+        'name': 'path-four',
+        'id': '#path-four',
+        'endNode': 'chart-dot-four'
+      }
+    ]
+  },
+  'chart-dot-seven': {
+    'id': '#chart-dot-eight',
+    'paths': null
+  },
+  'chart-dot-eight': {
+    'id': '#chart-dot-eight',
+    'paths': [
+      {
+        'name': 'path-five',
+        'id': '#path-five',
+        'endNode': 'chart-dot-one'
+      },
+      {
+        'name': 'path-seven',
+        'id': '#path-seven',
+        'endNode': 'chart-dot-six'
+      }
+    ]
+  },
+  'chart-dot-nine': {
+    'id': '#chart-dot-nine',
+    'paths': []
+  }
+}
 
 
 
@@ -274,42 +401,50 @@ function createDashArray(dashing, length) {
 
   // This animates with dotted line, allow more abstract class targeting
   // TODO: Might be deprecated
-  function animateSevenPath() {
-    const path = svg.select('#path-group-seven');
-    const d = path.attr('d');
-    const endNode = path.attr('data-end-node');
+//   function animateSevenPath() {
+//     const path = svg.select('#path-group-seven');
+//     const d = path.attr('d');
+//     const endNode = path.attr('data-end-node');
 
-    const pathWhite = svg.insert('path', 'path#path-group-eight')
-      .attr('id', 'path-group-insert-white')
-      .attr('d', d)
-      .attr('stroke', '#FFFFFF')
-      .attr('stroke-width', 2)
+//     const pathWhite = svg.insert('path', 'path#path-group-eight')
+//       .attr('id', 'path-group-insert-white')
+//       .attr('d', d)
+//       .attr('stroke', '#FFFFFF')
+//       .attr('stroke-width', 2)
 
-    const pathDotted = svg.insert('path', 'path#path-group-eight')
-      .attr('id', 'path-group-insert-two')
-      .attr('d', d)
-      .attr('stroke', '#FA2F97')
-      .attr('stroke-width', 2)
+//     const pathDotted = svg.insert('path', 'path#path-group-eight')
+//       .attr('id', 'path-group-insert-two')
+//       .attr('d', d)
+//       .attr('stroke', '#FA2F97')
+//       .attr('stroke-width', 2)
 
-    const totalLength = path.node().getTotalLength();
-    const dashArray = createDashArray('3, 3', totalLength);
+//     const totalLength = path.node().getTotalLength();
+//     const dashArray = createDashArray('3, 3', totalLength);
 
-    d3.select('path#path-group-insert-two')
-      .attr('stroke-dashoffset', totalLength)
-      .attr('stroke-dasharray', dashArray)
-      .transition()
-        .duration(1000)
-        .ease(d3.easeLinear)
-        .attr('stroke-dashoffset', 0);
+//     d3.select('path#path-group-insert-two')
+//       .attr('stroke-dashoffset', totalLength)
+//       .attr('stroke-dasharray', dashArray)
+//       .transition()
+//         .duration(1000)
+//         .ease(d3.easeLinear)
+//         .attr('stroke-dashoffset', 0);
 
-    d3.select('#path-group-insert-white')
-      .attr('stroke-dasharray', totalLength + ' ' + totalLength)
-      .attr('stroke-dashoffset', totalLength)
-      .transition()
-        .duration(1200)
-        .ease(d3.easeLinear)
-        .attr('stroke-dashoffset', 0);
+//     d3.select('#path-group-insert-white')
+//       .attr('stroke-dasharray', totalLength + ' ' + totalLength)
+//       .attr('stroke-dashoffset', totalLength)
+//       .transition()
+//         .duration(1200)
+//         .ease(d3.easeLinear)
+//         .attr('stroke-dashoffset', 0);
 
-    fillInDot({targetNode: endNode});
-  }
+//     fillInDot({targetNode: endNode});
+//   }
+
+
+
+
+
+
+
+
 }
