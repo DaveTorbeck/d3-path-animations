@@ -22,13 +22,16 @@
     addNavListeners();
   }
 
-  function reset() {
+  function reset({removePath = false} = {}) {
     if (selectedPath === null) return;
 
     const drawnPath = d3.select('#' + selectedPath.attr('id') + '-draw-line');
     const endNode = d3.select('#' + selectedPath.attr('data-end-node'));
 
-    drawnPath.remove();
+    if (removePath) {
+      drawnPath.remove();
+    }
+
     unfillDot(endNode);
     selectedPath = null;
     notSelectedPath = null;
@@ -58,7 +61,7 @@
       const currentNodeId = currentNode.attr('id');
       const possiblePaths = roadMap[currentNodeId].paths
 
-      reset();
+      reset({removePath: true});
 
       selectedPath = path;
 
@@ -74,6 +77,7 @@
       if (isAnimating) return;
 
       path.classed('highlight-line', true);
+      path.classed('dashed-line', false);
       fillInDot({targetNode: endNode});
     }
 
@@ -82,6 +86,7 @@
 
       if (!isNodeFull) {
         path.classed('highlight-line', false);
+        path.classed('dashed-line', true);
         unfillDot(endNode)
       }
     }
@@ -94,9 +99,8 @@
 
     function onClick() {
       if (selectedPath !== null) {
-        const animatedPath = selectedPath;
-        console.log('NOT SELECTED PATH: ')
-        console.log(notSelectedPath.node());
+        const endNode = d3.select('#' + selectedPath.attr('data-end-node'));
+        const delay = 10;
 
         invalidatePath(notSelectedPath);
         changeToPastNode(currentNode);
@@ -113,19 +117,18 @@
 
         reset();
 
-
-        animateAnswerPath(animatedPath, true);
+        expandEllipsis(endNode, delay)
 
         if (nextPathOne.node() !== null)
-          animateBlackPath(nextPathOne, 1010);
+          animateBlackPath(nextPathOne, delay);
 
         if (nextPathTwo.node() !== null)
-          animateBlackPath(nextPathTwo, 1010);
+          animateBlackPath(nextPathTwo, delay);
       }
     }
   }
 
-  function animateAnswerPath(path, expandNode = false) {
+  function animateAnswerPath(path) {
     const pathId = path.attr('id');
     const duration = 1000;
     const d = path.attr('d');
@@ -134,8 +137,7 @@
 
     isAnimating = true;
 
-    if (!expandNode)
-      unfillDot(endNode)
+    unfillDot(endNode)
 
     // Reset path from hover event
     path
@@ -153,18 +155,14 @@
           .ease(d3.easeLinear)
           .attr('stroke-dashoffset', 0);
 
-    if (expandNode) {
-      expandEllipsis(endNode, duration + 10)
-    } else {
-      const payload = {
-        targetNode: endNode,
-        delay: duration + 10,
-        transition: true,
-        filled: true
-      };
+    const payload = {
+      targetNode: endNode,
+      delay: duration + 10,
+      transition: true,
+      filled: true
+    };
 
-      fillInDot(payload);
-    }
+    fillInDot(payload);
   }
 
   function animateBlackPath(path, delay = 0) {
@@ -389,7 +387,7 @@
         },
         {
           'name': 'path-nine',
-          'id': 'path-nine',
+          'id': '#path-nine',
           'endNode': 'chart-dot-nine'
         }
       ]
