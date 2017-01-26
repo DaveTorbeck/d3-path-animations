@@ -10,10 +10,10 @@
   const WHITE = '#FFF';
   const GREY = '#C9C9C9';
 
-  let currentNode = d3.select('#chart-dot-two');
   let selectedPath = null;
   let notSelectedPath = null;
   let isAnimating = false;
+  let stepCount = 0;
 
   init();
 
@@ -50,7 +50,6 @@
       const path = d3.select(pathName)
       const endNode = d3.select('#' + path.attr('data-end-node'));
 
-
       button
         .on('click', () =>  onClick(path))
         .on('mouseenter', () => mouseEnterAnswer(path, endNode))
@@ -58,6 +57,7 @@
     });
 
     function onClick(path) {
+      const currentNode = journeyMap[stepCount].currentNode;
       const currentNodeId = currentNode.attr('id');
       const possiblePaths = roadMap[currentNodeId].paths
 
@@ -74,7 +74,7 @@
     }
 
     function mouseEnterAnswer(path, endNode) {
-      if (isAnimating) return;
+      if (isAnimating || path === selectedPath) return;
 
       path.classed('highlight-line', true);
       path.classed('dashed-line', false);
@@ -92,40 +92,9 @@
     }
   }
 
-  // TODO: Implement prev
   function addNavListeners() {
-
-    nextBtn.on('click', onClick);
-
-    function onClick() {
-      if (selectedPath !== null) {
-        const endNode = d3.select('#' + selectedPath.attr('data-end-node'));
-        const delay = 10;
-
-        invalidatePath(notSelectedPath);
-        changeToPastNode(currentNode);
-
-        currentNode = d3.select(`#${selectedPath.attr('data-end-node')}`)
-
-        const nextPathOne = d3.select(`#${currentNode.attr('data-path-one')}`);
-        const nextPathTwo = d3.select(`#${currentNode.attr('data-path-two')}`);
-
-        answerOneBtn.attr('data-path', currentNode.attr('data-path-one'));
-        answerTwoBtn.attr('data-path', currentNode.attr('data-path-two'));
-
-        addAnswerListeners();
-
-        reset();
-
-        expandEllipsis(endNode, delay)
-
-        if (nextPathOne.node() !== null)
-          animateBlackPath(nextPathOne, delay);
-
-        if (nextPathTwo.node() !== null)
-          animateBlackPath(nextPathTwo, delay);
-      }
-    }
+    nextBtn.on('click', onNextClick);
+    prevBtn.on('click', onPrevClick);
   }
 
   function animateAnswerPath(path) {
@@ -283,16 +252,74 @@
     }, delay)
   }
 
+  function onNextClick() {
+    if (selectedPath !== null) {
+      const endNode = d3.select('#' + selectedPath.attr('data-end-node'));
+      const delay = 10;
+      const prevNode = journeyMap[stepCount].currentNode;
+
+      stepCount += 1;
+
+      const currentStepObj = journeyMap[stepCount];
+
+      currentStepObj.prevNode = prevNode;
+
+      changeToPastNode(prevNode);
+
+      currentStepObj.currentNode = d3.select(`#${selectedPath.attr('data-end-node')}`)
+      invalidatePath(notSelectedPath);
+
+      const nextPathOne = d3.select(`#${currentStepObj.currentNode.attr('data-path-one')}`);
+      const nextPathTwo = d3.select(`#${currentStepObj.currentNode.attr('data-path-two')}`);
+
+      resetAnswerButtons(currentNode);
+
+      reset();
+
+      expandEllipsis(endNode, delay)
+
+      if (nextPathOne.node() !== null)
+        animateBlackPath(nextPathOne, delay);
+
+      if (nextPathTwo.node() !== null)
+        animateBlackPath(nextPathTwo, delay);
+    }
+  }
+
+  function onPrevClick() {
+    if (stepCount === 0) return;
+
+    const currentNode = journeyMap[stepCount].currentNode;
+    const prevNode = journeyMap[stepCount].prevNode;
+
+    const pathOne = d3.select(`#${currentNode.attr('data-path-one')}`)
+    const pathTwo = d3.select(`#${currentNode.attr('data-path-two')}`)
+
+    invalidatePath(pathOne)
+    invalidatePath(pathTwo)
+    changeToPastNode(currentNode);
+
+    stepCount -= 1;
+
+    journeyMap[stepCount].currentNode = prevNode;
+
+    expandEllipsis(prevNode)
+
+    resetAnswerButtons();
+
+  }
+
 
   function clonePathAndInsert(path) {
     const d = path.attr('d');
     const stroke = path.attr('stroke');
     const strokeWidth = path.attr('stroke-width');
-    const clonedPath = svg.insert('path', `#${path.attr('id')}`)
-                          .attr('id', `${path.attr('id')}-draw-line-grey`)
-                          .attr('d', d)
-                          .attr('stroke', stroke)
-                          .attr('stroke-width', strokeWidth);
+    const clonedPath =
+      svg.insert('path', `#${path.attr('id')}`)
+        .attr('id', `${path.attr('id')}-draw-line-grey`)
+        .attr('d', d)
+        .attr('stroke', stroke)
+        .attr('stroke-width', strokeWidth);
 
     return clonedPath;
   }
@@ -316,6 +343,32 @@
       .on('mouseenter', null)
       .on('mouseout', null);
   }
+
+  function resetAnswerButtons(node) {
+    answerOneBtn.attr('data-path', node.attr('data-path-one'));
+    answerTwoBtn.attr('data-path', node.attr('data-path-two'));
+
+    addAnswerListeners();
+  }
+
+  var journeyMap = [
+    {
+      'currentNode': (() => d3.select('#chart-dot-two'))(),
+      'prevNode': null
+    },
+    {
+      'currentNode': null,
+      'prevNode': null
+    },
+    {
+      'currentNode': null,
+      'prevNode': null
+    },
+    {
+      'currentNode': null,
+      'prevNode': null
+    }
+  ];
 
   var roadMap = {
     'chart-dot-one': {
